@@ -1,0 +1,42 @@
+% This file was created by tikzplotlib v0.8.2.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{0.12156862745098,0.466666666666667,0.705882352941177}
+
+\begin{axis}[
+legend cell align={left},
+legend style={at={(0.09,0.5)}, anchor=west, draw=white!80.0!black},
+tick align=outside,
+tick pos=both,
+x grid style={lightgray!92.02614379084967!black},
+xlabel={Layer},
+width = 0.9\linewidth,
+height = \tokenClassifierPlotHeight,
+xmajorgrids,
+xmin=1, xmax=12,
+xtick style={color=black},
+y grid style={lightgray!92.02614379084967!black},
+ylabel={Accuracy},
+ymajorgrids,
+ymin=0.95958591405561, ymax=0.998679491140029,
+ytick style={color=black}
+]
+\addplot [thick, color0]
+table {%
+1 0.997274068168295
+2 0.994439976627485
+3 0.991803160476923
+4 0.991047919160033
+5 0.989871218694771
+6 0.989730074058137
+7 0.983875596597795
+8 0.981180095821958
+9 0.97701690234345
+10 0.969843127515138
+11 0.964616372557541
+12 0.968497614597739
+};
+\addlegendentry{Binary MLP Classifier}
+\end{axis}
+
+\end{tikzpicture}

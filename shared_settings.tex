@@ -1,0 +1,68 @@
+% Settings for content and cover
+
+%\RequirePackage{relsize}  % change font size relative to current size
+
+% Book info
+\def\BOOKTITLE{Increasing scalability, privacy, and censorship-resistance of the Bitcoin ecosystem}
+\def\BOOKTITLEPLAINTEXT{Increasing scalability, privacy, and censorship-resistance of the Bitcoin ecosystem}  % for spine and PDF info
+
+\def\KEYWORDS{bitcoin, cryptocurrency, blockchains}  % for PDF info  % keywords from papers
+\def\DISCOSERIESNUMBER{42}  % check e.g. list of PhD students in Roger's CV: https://disco.ethz.ch/members/wroger/CV.pdf
+\def\TIKSERIESNUMBER{???}  % from Beat
+\def\DISSNUMBER{?????}  % on official invitation for doctoral examination
+\def\ACCEPTYEAR{2022}  % year of the department conference after the defense (https://ethz.ch/services/de/news-und-veranstaltungen/akademischer-kalender/termine-pro-departement.html)
+\def\COEXAMINERONE{Prof.\ Dr.\ Andrew Miller}
+\def\COEXAMINERTWO{Prof.\ Dr.\ Majid Khabbazian}
+
+% Personal details
+\def\AUTHOR{Tejaswi Nadahalli}  % include middle names
+\def\LASTNAME{Nadahalli}  % for spine
+\def\MASTERDEGREE{M-Tech in Information Technology, IIT-Bombay, India}  % according to diploma / degree certificate
+\def\BIRTHDATE{19.11.1979}
+\def\CITIZENSHIP{India}  % Swiss citizens: place of origin, according to birth certificate. Foreign citizens: nationality
+
+
+% Back cover content
+
+\def\backcoverabstract{
+TODO
+% Localization is a fundamental technology embedded --- often unbeknownst %invisible
+% to users --- in many devices and services.
+% First, this book reveals how localization systems are driving modern society. % and gives an overview of localization methods and systems in use today. %gives insights
+% %Also, the relation between localization and time synchronization is explained and it is shown that many applications are actually using localization systems for timing purposes.
+% %
+% The core focus is then on the \emph{Global Positioning System (GPS)}, which %since its inception in 1973
+% is constantly rising in importance due to its global availability and low receiver cost.
+% %GPS fundamentals including A-GPS and CTN
+% Still, high energy consumption and susceptibility to fake or reflected signals are challenges for GPS receivers.
+% %Solutions to both problems are presented.
+
+% The limited endurance of battery-powered GPS receivers can be addressed by snapshot receivers which require as little as one millisecond of received satellite signals to determine their location. Using short signals reduces the active time and thus the energy consumption of a GPS receiver drastically. But short signals reduce the received signal energy, %the relative strength of the received signal to the noise is reduced,
+% which impairs the localization robustness. %requires careful handling to correctly determine the receiver's location.
+% The \emph{collective detection} maximum likelihood method performs well with short signals. %It computes a likelihood distribution %in space and time
+% %of the receiver location and a branch-and-bound approach ensures good computation performance. 
+% Furthermore, %since no commercial snapshot receivers exist to date,
+% a tiny and low power snapshot GPS receiver hardware design allows location tracking for months or years using a coin cell.
+
+% Spoofed GPS satellite signals pose a threat to an increasing number of critical systems relying on GPS. %for localization or time synchronization.
+% Determining multiple %$k$ most
+% likely localization solutions instead of only one enables correct receiver localization despite %the presence of
+% malicious signals.
+
+% Finally, an experimental localization system is presented that leverages status messages transmitted by aircraft. It aims at combining the ubiquitous availability and low receiver cost of GPS with the high signal strength of local localization systems like those based on WiFi or LTE signals. As such, it gives the prospect of robust and possibly indoor localization without the high setup costs of short-range localization systems.
+% % ADS-B as alternative, short signals but still high SNR / signal strength due to three orders of magnitude closer transmitters, which are aircraft instead of satellites. And still more or less globally available. Especially where GPS has the most problems, which is in urban areas due to line-of-sign obstructions between satellites and receivers.
+
+% This book is suitable for readers with a technical background, but no prior knowledge of localization systems. Readers familiar with GPS can skip the introductory chapters and directly dive into the advanced material. %provided in the subsequent chapters.
+}
+
+\def\abouttheauthor{
+Tejaswi Nadahalli performed his doctoral studies in the Distributed Computing Group at ETH Zurich under the supervision of Prof.\ Dr.\ Roger Wattenhofer, attaining the Ph.D.\ degree (Doctor of Sciences) in 2022.
+}
+
+
+% Book format
+\newlength{\PAGEWIDTH}  % \def would just store the string, not a number, which makes it unsuitable for computations (e.g. 2\PAGEWIDTH)
+\newlength{\PAGEHEIGHT}
+% Amazon standard format
+\setlength{\PAGEWIDTH}{6in}
+\setlength{\PAGEHEIGHT}{9in}

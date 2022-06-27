@@ -1,0 +1,71 @@
+% This file was created by tikzplotlib v0.8.2.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{1,0.647058823529412,0}
+
+\begin{axis}[
+legend cell align={left},
+legend style={at={(0,0)}, anchor=south west,font=\scriptsize, draw=white!80.0!black},
+tick align=outside,
+tick pos=both,
+width = \linewidth,
+height = 5cm,
+x grid style={lightgray!92.02614379084967!black},
+xlabel={Layer},
+xmajorgrids,
+xmin=0.5, xmax=11.5,
+xtick style={color=black},
+y grid style={lightgray!92.02614379084967!black},
+ylabel={Accuracy},
+ymajorgrids,
+ymin=0.5, ymax=1.02,
+ytick style={color=black}
+]
+\addplot [thick, blue]
+table {%
+1 0.995702885205648
+2 0.997237569060773
+3 0.965469613625566
+4 0.936924493773866
+5 0.888275015602967
+6 0.811847759727469
+7 0.724984653198039
+8 0.643799877261881
+9 0.589625537615016
+10 0.56108041721447
+11 0.54972375654018
+};
+\addlegendentry{trained on layer 1}
+\addplot [thick, black]
+table {%
+1 0.941835481561423
+2 0.969306322568176
+3 0.983578882237897
+4 0.992326580724371
+5 0.99109883364027
+6 0.988336403066941
+7 0.988489871269505
+8 0.981890730692464
+9 0.947206874871415
+10 0.891037446725142
+11 0.810926949524162
+};
+\addlegendentry{trained on layer 6}
+\addplot [thick, color0]
+table {%
+1 0.815224063440361
+2 0.862952731700672
+3 0.905463474597427
+4 0.910527930953446
+5 0.93232044202554
+6 0.940300798072194
+7 0.952271332142176
+8 0.962860650925493
+9 0.970227132881251
+10 0.968692449026125
+11 0.961632903292546
+};
+\addlegendentry{trained on layer 11}
+\end{axis}
+
+\end{tikzpicture}

@@ -1,0 +1,728 @@
+%
+% Doctoral thesis template by Gino Brunner
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\TARGET{1} % 1 = book (A5), 2 = review (A4)
+\def\ETARGET{2} % 1 = print, 2 = electronic
+
+\input{shared_settings}
+
+% Note on pdfTeX warning: "multiple pdfs with page group included in a single page" -> https://tex.stackexchange.com/questions/76273/multiple-pdfs-with-page-group-included-in-a-single-page-warning. See answers by Martin Schröder, Rufflewind and Velocipede Berserker. -> Use e.g. nano editor to remove page groups from images (search for "Group" and remove corresponding blocks with "<<" and until ">>").
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Document Type %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\IfBook}[2]{\ifnum\TARGET=1 #1\else#2\fi}
+\newcommand{\IfElectronic}[2]{\ifnum\ETARGET=1 #2\else#1\fi}
+%TODO Add \IfBlackAndWhite for selecting B&W (for print) or color images (for electronic).
+
+\IfBook{
+	\IfElectronic{
+		\documentclass[9pt,oneside,openright,headings=optiontohead]{extreport}
+	}{
+		\documentclass[9pt,twoside,openright,headings=optiontohead]{extreport}
+	}
+}{
+	\documentclass[11pt,a4paper,oneside,openright,headings=optiontohead]{extreport}
+	% Create watermark on titlepage    
+    \RequirePackage[firstpage]{draftwatermark}
+    \SetWatermarkText{For Review}
+    \SetWatermarkLightness{0.8}
+    \SetWatermarkScale{1}
+}
+
+\IfBook{
+	%\RequirePackage[top=1.5in,bottom=1.3in]{geometry}
+	\RequirePackage[paperwidth=\PAGEWIDTH, paperheight=\PAGEHEIGHT, heightrounded]{geometry}
+}{
+	\RequirePackage[margin=1.5in]{geometry}
+}
+
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}  % mostly for Windows
+
+% Set maximum PDF version for compatibility with included figures
+%\pdfminorversion=5
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Prevent "Too many math alphabets used in version normal." error (https://tex.stackexchange.com/questions/3676/too-many-math-alphabets-error)
+% Needs to be set before package "bm" is included (as a dependency of some other package).
+\newcommand\hmmax{0}
+\newcommand\bmmax{0}
+
+% languages
+\RequirePackage[english, ngerman]{babel} % ngerman: new german hyphenation
+
+\RequirePackage[hyphens]{url} % allow breaking links at hyphens (needs to be specified before loading the "hyperref" package)  % option [hyphens] enables linebreaks with hyphens in URLs
+% PDF metadata
+% "hyperref" parameters need to be set before including "bookmark" package, because that imports hyperref implicitly. Can also just do PassOptionsToPackage{...}{hyperref}, as long as hyperref is imported below.
+\RequirePackage[  %TODO add "breaklinks"? (only true by default for pdftex according to package manual, but still seems to work fine with lualatex and xelatex) -> maybe not needed with URL package?
+            colorlinks=true,
+            linkcolor=black, %black,
+            anchorcolor=black,
+            citecolor=black, %black,
+            filecolor=black,
+            menucolor=black,
+            urlcolor=black,
+            bookmarks,
+            plainpages=false,
+            pdfpagelabels,
+            %hypertexnames=false, % this option makes index links jump to the wrong page. is this option needed for anything?
+            bookmarksopen=false,
+            pdfauthor={\AUTHOR},
+            pdftitle={\BOOKTITLEPLAINTEXT},
+            pdfsubject={PhD Thesis of \AUTHOR, ETH Zurich, \ACCEPTYEAR},
+            pdfkeywords={\KEYWORDS}
+    ]{hyperref}  % url, href
+
+% drawing
+\RequirePackage{tikz}
+\usetikzlibrary{positioning, shapes.misc, shapes, shadows, arrows, chains, decorations.pathreplacing, decorations.pathmorphing, shapes.arrows, fadings, calc, quotes, angles, arrows.meta, decorations.markings, automata, petri, calc,positioning,shadows.blur}  % arrows.meta for scalable arrow heads, decorations.markings for multibit digital lines  % more: shapes.geometric, circuits
+%\usetikzlibrary{external}
+%\tikzexternalize[prefix=images/]
+\RequirePackage{tikz-3dplot}
+
+\RequirePackage{pgfplots}  % e.g. axis environment
+\usetikzlibrary{pgfplots.groupplots}
+\pgfplotsset{compat=newest}  %TODO Without this, get a pgfplots warning. It even appears when only including package pgfplots... strange.  % compat=newest?
+\pgfplotsset{plot coordinates/math parser=false}
+
+% figures
+\RequirePackage{graphicx}
+%\RequirePackage{svg}  % Note: seems to include package "transparent" as a dependency -> Amazon KDP does not like transparency...
+\RequirePackage{rotating} % sidewaystable
+
+% inkscape svg figures with embedded LateX
+%\RequirePackage{xcolor}  % for matlab2tikz generated figures  % \definecolor  % package is also included by tikz
+%\RequirePackage{transparent}  % Amazon KDP does not like transparency...
+
+\RequirePackage[labelfont=bf,margin=0cm]{caption} % small: smaller text. font={bf,it}: all bold and italic. textfont=it: text without label italic. justification=centering: center captions. % note: "rotating" package has to be included first 
+%\DeclareCaptionType{copyrightbox}  % HACK http://tex.stackexchange.com/questions/86603/subcaption-compatibility-with-acm-document-class
+\RequirePackage{subcaption} % better than subfigure and subfig: https://tex.stackexchange.com/questions/13625/subcaption-vs-subfig-best-package-for-referencing-a-subfigure
+%\RequirePackage[list=true,margin=1cm,justification=centering,font=small]{subcaption} % This removes boldness of captions. -> labelfont=bf?
+
+%\RequirePackage{epsfig}
+%\RequirePackage{epstopdf}
+
+% code listings
+\RequirePackage{verbatim}
+\RequirePackage{listings}
+
+% Algorithms
+\RequirePackage{algorithm}
+% Different algorithm environments (algorithmic, algorithmicx + algpseudocode, algorithm2e) -> https://tex.stackexchange.com/questions/229355/algorithm-algorithmic-algorithmicx-algorithm2e-algpseudocode-confused/230789#230789
+%\RequirePackage{algorithmic}
+%\RequirePackage[algo2e,boxed]{algorithm2e}
+\RequirePackage{algpseudocode}  % Cannot be included at the same time as package "algorithmic" or "algorithm2e".  % With algpseudocode (which uses algorithmicx), line breaks do not preserve indentation... (e.g. collective detection receiver)
+
+% text formatting, tables
+%\RequirePackage{extsizes} % BOOKLET to have 9pt size
+\RequirePackage{color, array, colortbl}
+%\RequirePackage[usenames]{color}
+\RequirePackage{multirow}
+\RequirePackage{tabularx}
+\RequirePackage{makecell}
+\RequirePackage{tablefootnote}
+\newcolumntype{Y}{>{\centering\arraybackslash}X} % what does this do? -> probably auto width column with centering instead of left aligned (raggedright)?
+
+\RequirePackage{calc}
+
+% mathematical symbols
+\RequirePackage{latexsym}
+\RequirePackage{amsmath,amsfonts,amsthm,amssymb,bm}
+\RequirePackage{mathrsfs}
+\RequirePackage{mathtools} % coloneqq, DeclarePairedDelimiter
+\RequirePackage{upgreek}   % upmu
+\RequirePackage{cite}
+
+\RequirePackage{siunitx}
+\RequirePackage{gensymb}  % degree
+
+% verbatim boxes
+\RequirePackage{fancyvrb}
+
+%\RequirePackage{fancybox}
+
+%\RequirePackage{balance}  % probably not needed for book, since only one column?
+\RequirePackage[titletoc,toc,page]{appendix}
+
+% Bibliography
+%\RequirePackage[sectionbib]{natbib}
+%\RequirePackage{chapterbib}
+
+% nice tables
+\RequirePackage{booktabs}  % toprule, midrule, bottomrule, for formal tables
+
+\RequirePackage{schemabloc} 
+
+% better lists
+\RequirePackage{enumitem}
+
+% fonts
+%\RequirePackage{fontspec}
+
+%\RequirePackage{collector}
+\RequirePackage{xspace}
+\RequirePackage{xparse}
+
+\RequirePackage{textcomp}
+\RequirePackage{lmodern}
+
+% chapter headers
+\RequirePackage[palatino]{quotchap}
+\RequirePackage{fncychap}
+\RequirePackage{fancyhdr}
+% chapter number colour
+\definecolor{chaptergrey}{rgb}{0.75,0.75,0.75}
+
+%\RequirePackage{epigraph}
+
+% more control over pdf bookmarks
+\RequirePackage{bookmark}
+
+% terms index
+\RequirePackage{makeidx}
+
+\RequirePackage{import}    % like \input but allows specifying a path instead of a file only (and also preserves the path prefix for all files reference by the included file)
+
+
+%\RequirePackage{comment}  % selectively in-/exclude pieces of text
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\fakeparagraph}[1]{\vspace{2mm}\noindent\textbf{#1.}}
+
+\newcommand{\etal}{et~al.\xspace}  %\@\xspace ?
+\newcommand{\eg}{e.\,g.,\xspace}
+\newcommand{\ie}{i.\,e.,\xspace}
+
+\newcommand{\REV}[1]{#1}  % only include for the review (layout stuff)
+
+\newcommand{\lyxdot}{.} % used for .svg.pdf files
+
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{facts}[theorem]{Facts}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+%\newtheorem{model}[theorem]{Model}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{protocol}[theorem]{Protocol}
+%\newtheorem{axiom}[theorem]{Axiom}
+
+% \emph results in bold and upright text in theorem-style environments
+\AtBeginEnvironment{definition}{\renewcommand\em{\bfseries\upshape}}
+\AtBeginEnvironment{theorem}{\renewcommand\em{\bfseries\upshape}}
+\AtBeginEnvironment{lemma}{\renewcommand\em{\bfseries\upshape}}
+\AtBeginEnvironment{claim}{\renewcommand\em{\bfseries\upshape}}
+\AtBeginEnvironment{facts}{\renewcommand\em{\bfseries\upshape}}
+\AtBeginEnvironment{corollary}{\renewcommand\em{\bfseries\upshape}}
+%\AtBeginEnvironment{model}{\renewcommand\em{\bfseries\upshape}}
+\AtBeginEnvironment{problem}{\renewcommand\em{\bfseries\upshape}}
+\AtBeginEnvironment{assumption}{\renewcommand\em{\bfseries\upshape}}
+\AtBeginEnvironment{example}{\renewcommand\em{\bfseries\upshape}}
+\AtBeginEnvironment{protocol}{\renewcommand\em{\bfseries\upshape}}
+%\AtBeginEnvironment{axiom}{\renewcommand\em{\bfseries\upshape}}
+
+
+%%% CompSys Clock Sync script
+
+% Remarks
+% max and min space before remarks
+\newlength{\remarkskip}
+\setlength{\remarkskip}{1ex plus0.3ex minus0.3ex}
+% defines remarks environment. optional argument can be used to change the default ``Remarks:'' label. (Is like "itemize", while \needspace prevents a page break directly after the ``Remarks:'' label.)
+\newenvironment{remarks}[1][Remarks]{\vspace{\remarkskip}
+%\needspace{3\baselineskip}  %TODO \needspace seems not to be defined or cause problems together with the bookformat
+\noindent\textbf{#1:}\begin{itemize}[leftmargin=1.5cm]}{\end{itemize}}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\E}{\mathbb{E}}
+
+% Algorithms
+% special formatting for a message that is sent
+\newcommand{\msg}[2]{{\normalfont \texttt{#1}\ifthenelse{\equal{#2}{}}{}{(#2)}}}
+% title for introducing a stage of an algorithm
+\newcommand{\stage}[1]{\item[] \vspace{0.6em} \emph{#1} \vspace{0.6em}}
+\newcommand{\algonote}[1]{\hspace{#1}$\triangleleft$}
+% temporary
+\newcommand{\tstage}[2][0.95]{ \item[] \vspace{0.6em} \makebox[#1\textwidth]{\emph{#2} \dotfill}\vspace{0.6em}}
+
+% TODOs on the page margin (\TODO, \REMARK)
+\RequirePackage{todonotes}
+% specific todo commands
+\setlength{\marginparwidth}{3cm}
+\newcommand{\TODO}[1]
+{\todo[prepend, caption={\textbf{Todo}}, size=\footnotesize]{\renewcommand{\baselinestretch}{0.85} \selectfont#1\par}}
+\newcommand{\REMARK}[1]
+{\todo[prepend, color=green, caption={\textbf{Remark}}, size=\footnotesize]{\renewcommand{\baselinestretch}{0.85} \selectfont#1\par}}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\def\D{\mathrm{d}}     % differential operator  % alternative: http://tex.stackexchange.com/a/123408
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\normshort}[1]{\lVert#1\rVert}
+
+% "corresponds to" sign
+\RequirePackage{scalerel,stackengine}
+\newcommand\equalhat{\mathrel{\stackon[1.5pt]{=}{\stretchto{%
+    \scalerel*[\widthof{=}]{\wedge}{\rule{1ex}{3ex}}}{0.5ex}}}}
+
+% overset (stackrel) with optional vertical spacing parameter
+\makeatletter
+\newcommand{\oset}[3][0ex]{
+  \mathrel{\mathop{#3}\limits^{
+    \vbox to#1{\kern-2\ex@
+    \hbox{$\scriptstyle#2$}\vss}}}}
+\makeatother
+
+% Dot product
+% http://tex.stackexchange.com/a/235120
+\makeatletter
+\newcommand*\dotp{\mathpalette\dotp@{.5}}
+\newcommand*\dotp@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@th#1\bullet$}}}}}
+\makeatother
+
+% Column vector
+% http://tex.stackexchange.com/a/2712: \colvec[a]{b}{c} or \colvec{a}{b}
+\newcommand*\colvec[3][]{
+    \begin{pmatrix}\ifx\relax#1\relax\else#1\\\fi#2\\#3\end{pmatrix}
+}
+
+% Equation label
+%\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+
+% Quotes at chapter beginnings
+\makeatletter
+\newenvironment{chapquote}[2][2em]
+{
+  \setlength{\@tempdima}{#1}%
+  \def\chapquote@author{#2}%
+  \parshape 1 \@tempdima \dimexpr\textwidth-2\@tempdima\relax%
+  \itshape
+}
+{\par\normalfont\hfill---\ \chapquote@author\hspace*{\@tempdima}\par\bigskip}
+\makeatother
+
+
+% Quotes command
+\newcommand{\quotes}[1]{``#1''}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Jambot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\noleftdelimiter}{\left.\kern-\nulldelimiterspace}
+% \usepackage[usestackEOL]{stackengine}
+% \usepackage[bookmarks=false]{hyperref}
+\stackMath
+
+\usepackage{wasysym}
+\usepackage{harmony}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Midi-VAE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\DeclareMathOperator{\lagr}{\mathcal{L}}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+\newcommand{\setmeterb}[2]{\ensuremath{%
+  \vcenter{\offinterlineskip
+    \halign{\hfil##\hfil\cr
+            $\scriptstyle#1$\cr
+            \noalign{\vskip1pt}
+            $\scriptstyle#2$\cr}
+  }}%
+}
+
+\usepackage{makecell}
+\usepackage{array}
+\newcolumntype{?}{!{\vrule width 1pt}}
+
+\newcommand{\ts}{\textsuperscript}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CycleGAN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\definecolor{tb_color_1}{RGB}{245,124,0}
+\definecolor{tb_color_2}{RGB}{0,167,247}
+
+\pgfplotscreateplotcyclelist{tb}{
+semithick,tb_color_1\\%
+semithick,tb_color_2\\%
+}
+
+\let\mathcup\cup
+\usepackage{musixtex}
+\let\musixcup\cup
+
+\DeclareRobustCommand*{\cup}{%
+  \ifmmode
+    \expandafter\mathcup
+  \else
+    \expandafter\musixcup
+  \fi
+}
+
+
+\usepackage{textcomp}
+\usepackage{xcolor}
+% \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+%     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CycleGAN ECML Eval %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Crossfit %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{mwe}
+\usepackage{boldline}
+\usepackage{mathpazo}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Swimming %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{tikzscale}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NLP Multitasking %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{adjustbox}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Identifiability in Transformers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepgfplotslibrary{dateplot}
+\usepackage{pdflscape}
+
+
+
+
+% Vectors
+\def\vzero{{\bm{0}}}
+\def\vone{{\bm{1}}}
+\def\vmu{{\bm{\mu}}}
+\def\vtheta{{\bm{\theta}}}
+\def\va{{\bm{a}}}
+\def\vb{{\bm{b}}}
+\def\vc{{\bm{c}}}
+\def\vd{{\bm{d}}}
+\def\ve{{\bm{e}}}
+\def\vf{{\bm{f}}}
+\def\vg{{\bm{g}}}
+\def\vh{{\bm{h}}}
+\def\vi{{\bm{i}}}
+\def\vj{{\bm{j}}}
+\def\vk{{\bm{k}}}
+\def\vl{{\bm{l}}}
+\def\vm{{\bm{m}}}
+\def\vn{{\bm{n}}}
+\def\vo{{\bm{o}}}
+\def\vp{{\bm{p}}}
+\def\vq{{\bm{q}}}
+\def\vr{{\bm{r}}}
+\def\vs{{\bm{s}}}
+\def\vt{{\bm{t}}}
+\def\vu{{\bm{u}}}
+\def\vv{{\bm{v}}}
+\def\vw{{\bm{w}}}
+\def\vx{{\bm{x}}}
+\def\vy{{\bm{y}}}
+\def\vz{{\bm{z}}}
+
+
+% Matrix
+\def\mA{{\bm{A}}}
+\def\mB{{\bm{B}}}
+\def\mC{{\bm{C}}}
+\def\mD{{\bm{D}}}
+\def\mE{{\bm{E}}}
+\def\mF{{\bm{F}}}
+\def\mG{{\bm{G}}}
+\def\mH{{\bm{H}}}
+\def\mI{{\bm{I}}}
+\def\mJ{{\bm{J}}}
+\def\mK{{\bm{K}}}
+\def\mL{{\bm{L}}}
+\def\mM{{\bm{M}}}
+\def\mN{{\bm{N}}}
+\def\mO{{\bm{O}}}
+\def\mP{{\bm{P}}}
+\def\mQ{{\bm{Q}}}
+\def\mR{{\bm{R}}}
+\def\mS{{\bm{S}}}
+\def\mT{{\bm{T}}}
+\def\mU{{\bm{U}}}
+\def\mV{{\bm{V}}}
+\def\mW{{\bm{W}}}
+\def\mX{{\bm{X}}}
+\def\mY{{\bm{Y}}}
+\def\mZ{{\bm{Z}}}
+\def\mBeta{{\bm{\beta}}}
+\def\mPhi{{\bm{\Phi}}}
+\def\mLambda{{\bm{\Lambda}}}
+\def\mSigma{{\bm{\Sigma}}}
+
+\newcommand{\R}{\mathbb{R}}
+
+% custom commands
+\def \effectiveAttnPlotHeight {4.5cm}
+\def \tokenClassifierPlotHeight {4.5cm}
+\def \contributionPlotsHeightFirst {4cm}
+\def \contributionPlotsHeight {4.5cm}
+\def \localKernelPlotsHeight {4.8cm}
+
+\def \tokenClassifierPlotHeightAppendix {5.5cm}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Layout/Appearance %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\interfootnotelinepenalty=10000 % this helps avoid linebreaks in footnotes which make latex die and throw mostly undebuggable errors: http://tug.org/pipermail/pdftex/2002-February/002216.html and http://tex.stackexchange.com/questions/32208/footnote-runs-onto-second-page 
+\RequirePackage[all]{nowidow} % try to avoid widows and orphans, https://tex.stackexchange.com/questions/4152/how-do-i-prevent-widow-orphan-lines, https://texfaq.org/FAQ-widows
+% the acmart class just does \widowpenalty=10000 \clubpenalty=10000 \brokenpenalty=10000
+
+%\fancyhead[LE,RO]{\thepage}  % header for \pagestyle{fancy}
+
+\begin{comment}
+\IfBook{
+%-------------------------- a5 -------------------------- BOOKLET
+\addtolength{\textheight}{20mm}
+%\addtolength{\textwidth}{0mm}
+}{
+%-------------------------- a4 -------------------------- REVIEW
+}
+
+\newlength{\margin}
+\setlength{\margin}{\paperwidth}
+\addtolength{\margin}{-\textwidth}
+\setlength{\margin}{.5\margin}
+\addtolength{\margin}{-1in}
+
+\IfBook{
+%-------------------------- a5 -------------------------- BOOKLET
+\setlength{\voffset}{0mm}
+\setlength{\oddsidemargin}{\margin}
+\setlength{\evensidemargin}{\margin}
+\setlength{\topmargin}{-0mm}
+%\addtolength{\oddsidemargin}{5mm}
+%\addtolength{\evensidemargin}{-5mm}
+}{
+%-------------------------- a4 -------------------------- REVIEW
+\setlength{\oddsidemargin}{\margin}
+\setlength{\evensidemargin}{\margin}
+%\addtolength{\textheight}{20mm}
+%\addtolength{\textwidth}{10mm}
+}
+\end{comment}
+
+
+% Ensure that empty pages generated by \cleardoublepage have no headings or page numbers
+% cleardoublepage: flush out figures and begin next chapter on right page
+\makeatletter
+\renewcommand{\cleardoublepage}
+{
+    \clearpage
+    \if@twoside
+		\thispagestyle{empty} % <---
+        \ifodd\c@page\else
+            %\hbox{}\newpage\if@twocolumn\hbox{}\newpage\fi  %\newpage just ends column, not page and does not force floats to be flushed out
+            \mbox{} \clearpage
+        \fi
+    \fi
+}
+\makeatother
+
+% For twosided formats, make sure that TOC and chapter starts have an empty page to the left.  %TODO Only for printed version?
+\makeatletter  % for \if@twoside
+\newcommand{\chapterstart}
+{
+    \clearpage  % end page and print all floats
+    \if@twoside
+        \thispagestyle{empty} \mbox{} \clearpage  % insert at least one empty page
+    \fi
+    \cleardoublepage  % start with a right page
+}
+\makeatother
+
+%\renewcommand{\thechapter}{\textit{\Alph{chapter}}}  % Chapter "numbers" are italic letters (alpha for lower case, Alph for upper case)
+%\renewcommand{\chaptername}{}  % Replace "Chapter" label in title. Does not work with babel. Instead, would have to use "\addto\captionsenglish{\renewcommand{\chaptername}{Lecture}}" and "...\captionsngerman..."
+
+% No header for chapter title pages (pagestyle)
+\makeatletter
+\renewcommand\chapter{%
+%  \if@openright\cleardoublepage\else\clearpage\fi  % Since cleardoublepage redefined above, always calling cleardoublepage is sufficient.  
+  %\chapterstart  % cannot do this here, because for first chapter, need to set page counter to 1 after this
+  \thispagestyle{plain}%  % no headers for the first page of a chapter
+  \global\@topnum\z@
+   \@printcites% DELETED
+  \@afterindentfalse
+  \secdef\@chapter\@schapter
+}
+
+% Chapter titles
+% remove size@chapter and replace it by:
+% lmr = lmodern
+% ppl = palatino
+% \fontsize{30}{20}\usefont{OT1}{ppl}{b}{n}\selectfont
+\renewcommand{\@makechapterhead}[1]{%
+  \chapterheadstartvskip%
+   {\size@chapter{\usefont{OT1}{ppl}{b}{n}\raggedleft
+    {\fontsize{100}{130}\usefont{OT1}{ppl}{b}{n}\selectfont\color{chaptergrey}
+      \ifnum \c@secnumdepth >\m@ne%
+      \if@mainmatter\thechapter%
+      \fi\fi
+      \par\nobreak}%
+\vspace{1em}
+     {\raggedright\advance\leftmargin10em\interlinepenalty\@M\Huge\textbf{#1}\par}}
+  \nobreak\chapterheadendvskip}}
+\makeatother
+
+
+% Shared numbering for tables, figures and algorithms
+\makeatletter
+\renewcommand*{\thetable}{\arabic{chapter}.\arabic{theorem}}
+\renewcommand*{\thefigure}{\arabic{chapter}.\arabic{theorem}}
+\renewcommand{\thealgorithm}{\arabic{chapter}.\arabic{theorem}}
+\let\c@table\c@theorem
+\let\c@figure\c@theorem
+\let\c@algorithm\c@theorem
+\makeatother
+
+
+% Set the image resolution for imported bitmaps to 150 dpi (ETH guidelines: < 150 dpi for color, < 300 dpi for b/w. LaTeX default is 72 dpi, according to the pdfTeX manual.)
+%\pdfimageresolution=150 %TODO Not sure if this does the right thing. The pdfTeX manual is unclear. The printed size and the pixel resolution should be independent, right?!  % could also be set per image: https://tex.stackexchange.com/questions/379926/can-i-explicitly-set-dpi-on-a-per-image-basis-with-includegraphics  %TODO And how to prevent upscaling of low resolution images?
+
+% Reduce the size of pics for the review on A4 (needs to be added when including pics!)
+\newlength{\figwidth}
+\IfBook{
+	\setlength{\figwidth}{0.97\textwidth}
+	\def\picStretch{0.8}
+}{
+	\setlength{\figwidth}{0.97\textwidth}
+	\def\picStretch{0.8}
+}
+
+
+% Large bullet points for itemize
+\renewcommand\labelitemi{\LARGE\textbullet}  % \raisebox{-1pt}{\textbullet} to center on non-capital letters
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Debug %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Meaningful log messages for changing labels
+%   Prints "label XYZ changed: ..."
+%   From https://tex.stackexchange.com/questions/154594/how-to-diagnose-a-permanent-labels-may-have-changed-warning
+\def\@testdef #1#2#3{%
+  \def\reserved@a{#3}\expandafter \ifx \csname #1@#2\endcsname
+ \reserved@a  \else
+\typeout{^^Jlabel #2 changed:^^J%
+\meaning\reserved@a^^J%
+\expandafter\meaning\csname #1@#2\endcsname^^J}%
+\@tempswatrue \fi}
+
+\usepackage[sorting=none]{biblatex}
+\bibliography{references}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Content %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% initialize word index
+\makeindex
+
+\begin{document}
+
+\selectlanguage{english}
+
+% Roman page numbers for prelude
+\pagenumbering{Roman}
+\hypersetup{pageanchor=false} % disable hyperref pageanchors in prelude to avoid internal duplicate page numbers
+
+%\pagestyle{empty}  % No page header for prelude
+\pagestyle{headings}
+
+%\chapterstart % If book format, this creates an empty page for a dedication before the titlepage
+\setcounter{page}{1}
+\thispagestyle{empty}  % no page number
+\include{./chapters/0.0.titlepage}
+
+\thispagestyle{empty}
+\include{./chapters/0.1.imprint}
+
+%\chapterstart
+\include{./chapters/0.2.abstract}
+
+%\chapterstart
+% \selectlanguage{ngerman}
+% \include{./chapters/abstract-german}
+% \selectlanguage{english}
+
+%\chapterstart
+\include{./chapters/0.4.acknowledgements}
+
+% For main content, use headings including page numbers by default
+\pagestyle{headings} % page number and section in header
+%\pagestyle{fancy}  % line below header
+%\pagestyle{myheadings} % only page number on top of the page in the outer corner (can be redefined)
+%\pagestyle{plain}  % page number in footer
+
+% Table of Contents
+
+\chapterstart
+\setcounter{tocdepth}{1}
+\tableofcontents
+% No page numbers for TOC
+%\addtocontents{toc}{\protect\thispagestyle{empty}}
+
+% Begin ordinary page counting
+
+\chapterstart
+\pagenumbering{arabic}
+\setcounter{page}{1}
+%\setcounter{chapter}{0}  % has no effect
+\hypersetup{pageanchor=true} % enable hyperref for following pages
+
+\chapterstart
+\include{./chapters/1.introduction}
+
+\chapterstart
+\include{./chapters/2.bribing}
+
+\chapterstart
+\include{./chapters/3.swaps}
+
+\chapterstart
+\include{./chapters/4.outpost}
+
+\chapterstart
+\include{./chapters/5.oracles}
+
+\chapterstart
+\include{./chapters/conclusion}
+
+\printbibliography
+
+\chapterstart
+\printindex
+
+% Do not print any page numbers (or headers) after this point
+\clearpage  % *after* the last page only
+\pagestyle{empty}
+\renewcommand\thispagestyle[1]{}  % disable chapters selecting a different pagestyle for the first page (page number in footer)  % nicer would be to only select a special first page style in \chapter when the pagestyle is not "empty"
+
+% CV can be omitted in electronic version
+
+\chapterstart
+\include{./chapters/7.cv}
+
+\end{document}

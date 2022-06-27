@@ -1,0 +1,194 @@
+%
+% Doctoral thesis cover page template by Manuel Eichelberger
+%   for Amazon KDP publishing
+%
+
+% Note: Need space for ISBN bar code in bottom right of back cover
+
+%TODO "release" version
+%     - make sure that pagecount is computed automatically (not in testing mode any more)
+%     - remove guidelines
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\showguidelines{0} % 1: show, 0: do not show
+
+\input{shared_settings}
+
+\def\coverbackgroundcolour{000000} % 800000, 004466, 333333
+\def\covertextcolour{FFFFFF}
+
+\def\backgroundmode{1} % different experiments: 0=empty background, 1=composite image
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Template %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Determine number of pages of the thesis (not sheets, pages!). used to calculate the spine width
+\pdfximage{./build/dissertation.pdf}
+\edef\pagecount{\the\pdflastximagepages}  % edef: evaluate commands instead of simply copying the text
+%\edef\pagecount{196}  % for testing before thesis content is done
+\message{Number of book pages = \pagecount}
+
+\newcommand{\IfShowGuidelines}[2]{\ifnum\showguidelines=1 #1\else#2\fi}
+
+\documentclass[tikz]{standalone}
+%\usetikzlibrary{calc}
+\usetikzlibrary{fadings,patterns}
+
+\RequirePackage{calc}
+
+\usepackage[export]{adjustbox}  % min width, etc. for includegraphics
+
+\RequirePackage{xcolor}
+\RequirePackage{lipsum}
+
+% \RequirePackage{fontspec}
+% \setsansfont{Roboto}
+
+% Background and text colours
+\definecolor{bgcolor}{HTML}{\coverbackgroundcolour}
+\definecolor{textcolor}{HTML}{\covertextcolour}
+
+% Amazon KDP cover specs: https://s3.amazonaws.com/POD-Publisher-Training-Website/File+Creation+and+File+Specs/Cover+Specifications.html (27.11.2018)
+\newlength{\bleedwidth}
+\setlength{\bleedwidth}{0.125in}
+\newlength{\pagethickness}
+\setlength{\pagethickness}{0.002252in}  % 0.002252" per b&w page (page, not sheet)
+
+\IfShowGuidelines
+{
+	\tikzstyle{guidelines}=[draw, dotted]
+}
+{
+	\tikzstyle{guidelines}=[]
+}
+
+
+\begin{document}
+
+% Font style
+\sffamily  % sans font
+\color{textcolor}
+
+\newlength{\spinewidth}
+\setlength{\spinewidth}{\pagecount\pagethickness}
+\newlength{\canvaswidth}
+\setlength{\canvaswidth}{2\PAGEWIDTH + \spinewidth + 2\bleedwidth}
+\newlength{\canvasheight}
+\setlength{\canvasheight}{\PAGEHEIGHT + 2\bleedwidth}
+
+\begin{tikzpicture}
+
+% Canvas spanning the entire region, including the bleed regions
+\node[
+  fill=bgcolor,
+  anchor=south west,
+  minimum width=\canvaswidth,
+  minimum height=\canvasheight,
+  draw
+] (canvas) at(-\bleedwidth, -\bleedwidth) {};
+
+% Background image (optional)
+\ifnum\backgroundmode=1
+\clip (canvas.south west) rectangle (canvas.north east);
+\node[xshift=-\spinewidth /2 - 3\PAGEWIDTH /2 + \spinewidth, yshift=-2.9cm] at (canvas) {
+  \includegraphics[width=3\PAGEWIDTH,clip,trim={0 0 115cm 0}]{./images/cover/Herschel_s_view_of_a_star_nursery_fixed_corner_fadeout.jpg}
+};
+\node[xshift=-\spinewidth /2 + 1.25\PAGEWIDTH /2, yshift=0.3cm] (background) at (canvas) {
+  \includegraphics[width=1.25\PAGEWIDTH]{./images/cover/Space_WeatherE_01_Portrait_Text_Print_v2_own_lines_fadeout.png}
+};
+\fi
+
+% Back (left) page
+\node[
+  anchor=south west,
+  inner sep=0,
+  outer sep=0,
+  minimum height=\PAGEHEIGHT,
+  minimum width=\PAGEWIDTH,
+  guidelines,
+] (lp) at (0,0) {};
+
+
+% Spine
+
+\def\lastnameshift{0cm}
+\ifnum\backgroundmode=1
+\def\lastnameshift{-0.5cm}
+\fi
+
+\node[
+  rotate=90,
+  anchor=north west,
+  inner sep=0,
+  outer sep=0,
+  minimum width=\PAGEHEIGHT,
+  minimum height=\spinewidth,
+  text width=\PAGEHEIGHT,
+  align=left,
+  guidelines
+] (spine) at (lp.south east) {%
+  \ifnum\pagecount>99  % Amazon prints spine text only for >= 100 pages
+    \hspace*{2cm} \hspace*{\lastnameshift} \LASTNAME \hspace*{-\lastnameshift} \hfill \BOOKTITLEPLAINTEXT \hfill \hspace*{1cm}~
+  \fi
+};
+
+
+% Front cover (right page)
+
+\node[
+  anchor=south west,
+  inner sep=0,
+  outer sep=0,
+  minimum height=\PAGEHEIGHT,
+  minimum width=\PAGEWIDTH,
+  guidelines
+] (frontcover) at (spine.south west) {};
+
+\node[inner sep=8mm, anchor=north west] at (frontcover.north west) {Series in Distributed Computing};
+\node[inner sep=8mm, anchor=north east] at (frontcover.north east) {Volume \DISCOSERIESNUMBER};
+
+\def\titleshift{1.6in}
+\def\authorshift{-11.5cm}
+\ifnum\backgroundmode=1
+%\def\titleshift{3.5cm}
+\def\authorshift{-3.2cm}
+\fi
+
+\node[yshift=\titleshift, text width=0.8\PAGEWIDTH, align=center] at (frontcover) (title) {\huge{\BOOKTITLE}};  % yshift=1.6in
+\node[below of=title, yshift=\authorshift] (author) {\Large{\AUTHOR}}; %yshift=-11.5cm % color=black % With yshift you can move the author name to the bottom of the page. This might look better or not depending if you have a two line title or a background image.
+
+
+% Front image (optional)
+%\node[above of=title, yshift=-1.4cm, xshift=2cm, rotate=-45] at (frontcover) {
+%  \includegraphics[width=0.8\PAGEWIDTH]{./images/cover/1_ESA_nonfree/GPS-III-A_alpha.png}
+%};
+
+
+% Back cover (left page)
+
+\newcommand{\backcover}[1]{
+\node[anchor=north, inner sep=8mm, color=#1] at (lp.north) {
+\begin{minipage}{4.6in}
+{\Large Series in Distributed Computing}\\
+edited by Roger Wattenhofer
+
+\vspace*{1cm}
+
+\textbf{Abstract}\\
+
+\backcoverabstract
+
+\vspace*{1cm}
+
+\textbf{About the author}\\
+
+\abouttheauthor
+
+\end{minipage}
+};
+}
+
+\backcover{textcolor}
+
+\end{tikzpicture}
+\end{document}

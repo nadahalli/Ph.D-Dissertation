@@ -1,0 +1,650 @@
+% This file was created by matplotlib2tikz v0.6.18.
+\begin{tikzpicture}
+
+\begin{axis}[
+colorbar,
+colorbar style={ytick={0,0.2,0.4,0.6,0.8,1},yticklabels={0.0,0.2,0.4,0.6,0.8,1.0},ylabel={}},
+colormap={mymap}{[1pt]
+  rgb(0pt)=(0.968627450980392,0.984313725490196,1);
+  rgb(1pt)=(0.870588235294118,0.92156862745098,0.968627450980392);
+  rgb(2pt)=(0.776470588235294,0.858823529411765,0.937254901960784);
+  rgb(3pt)=(0.619607843137255,0.792156862745098,0.882352941176471);
+  rgb(4pt)=(0.419607843137255,0.682352941176471,0.83921568627451);
+  rgb(5pt)=(0.258823529411765,0.572549019607843,0.776470588235294);
+  rgb(6pt)=(0.129411764705882,0.443137254901961,0.709803921568627);
+  rgb(7pt)=(0.0313725490196078,0.317647058823529,0.611764705882353);
+  rgb(8pt)=(0.0313725490196078,0.188235294117647,0.419607843137255)
+},
+point meta max=1,
+point meta min=0,
+tick align=outside,
+tick pos=left,
+x grid style={lightgray!92.026143790849673!black},
+xlabel={Predicted label},
+xmin=-0.5, xmax=9.5,
+xtick={0,1,2,3,4,5,6,7,8,9},
+xticklabel style = {rotate=45},
+xticklabels={Push-up,Pull-up,Burpee,KB deadlift,Box jump,Air squat,Sit-up,Wall ball,KB thruster,KB press},
+y grid style={lightgray!92.026143790849673!black},
+ylabel={True label},
+ymin=-0.5, ymax=9.5,
+ytick={0,1,2,3,4,5,6,7,8,9},
+y dir=reverse,
+yticklabels={Push-up,Pull-up,Burpee,KB deadlift,Box jump,Air squat,Sit-up,Wall ball,KB thruster,KB press}
+]
+\addplot graphics [includegraphics cmd=\pgfimage,xmin=-0.5, xmax=9.5, ymin=9.5, ymax=-0.5] {images/har/crossfit/confusionMatrixAll-000.png};
+%\path [draw=black, fill opacity=0] (axis cs:0,9.5)
+%--(axis cs:0,-0.5);
+
+%\path [draw=black, fill opacity=0] (axis cs:1,9.5)
+%--(axis cs:1,-0.5);
+
+%\path [draw=black, fill opacity=0] (axis cs:-0.5,0)
+%--(axis cs:9.5,0);
+
+%\path [draw=black, fill opacity=0] (axis cs:-0.5,1)
+%--(axis cs:9.5,1);
+
+\node at (axis cs:0,0)[
+  scale=0.7,
+  anchor=base,
+  text=white,
+  rotate=0.0
+]{ 1.000};
+\node at (axis cs:1,0)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:2,0)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:3,0)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:4,0)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:5,0)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:6,0)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:7,0)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:8,0)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:9,0)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:0,1)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:1,1)[
+  scale=0.7,
+  anchor=base,
+  text=white,
+  rotate=0.0
+]{ 0.997};
+\node at (axis cs:2,1)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:3,1)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:4,1)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:5,1)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:6,1)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:7,1)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.003};
+\node at (axis cs:8,1)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:9,1)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:0,2)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:1,2)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:2,2)[
+  scale=0.7,
+  anchor=base,
+  text=white,
+  rotate=0.0
+]{ 1.000};
+\node at (axis cs:3,2)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:4,2)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:5,2)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:6,2)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:7,2)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:8,2)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:9,2)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:0,3)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:1,3)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:2,3)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:3,3)[
+  scale=0.7,
+  anchor=base,
+  text=white,
+  rotate=0.0
+]{ 1.000};
+\node at (axis cs:4,3)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:5,3)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:6,3)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:7,3)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:8,3)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:9,3)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:0,4)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:1,4)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:2,4)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:3,4)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:4,4)[
+  scale=0.7,
+  anchor=base,
+  text=white,
+  rotate=0.0
+]{ 1.000};
+\node at (axis cs:5,4)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:6,4)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:7,4)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:8,4)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:9,4)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:0,5)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:1,5)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:2,5)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:3,5)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:4,5)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:5,5)[
+  scale=0.7,
+  anchor=base,
+  text=white,
+  rotate=0.0
+]{ 1.000};
+\node at (axis cs:6,5)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:7,5)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:8,5)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:9,5)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:0,6)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:1,6)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:2,6)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:3,6)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:4,6)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:5,6)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:6,6)[
+  scale=0.7,
+  anchor=base,
+  text=white,
+  rotate=0.0
+]{ 1.000};
+\node at (axis cs:7,6)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:8,6)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:9,6)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:0,7)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:1,7)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:2,7)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:3,7)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:4,7)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:5,7)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:6,7)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:7,7)[
+  scale=0.7,
+  anchor=base,
+  text=white,
+  rotate=0.0
+]{ 1.000};
+\node at (axis cs:8,7)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:9,7)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:0,8)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:1,8)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:2,8)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:3,8)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:4,8)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:5,8)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:6,8)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:7,8)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:8,8)[
+  scale=0.7,
+  anchor=base,
+  text=white,
+  rotate=0.0
+]{ 1.000};
+\node at (axis cs:9,8)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:0,9)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:1,9)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:2,9)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:3,9)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:4,9)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:5,9)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:6,9)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:7,9)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:8,9)[
+  scale=0.7,
+  anchor=base,
+  text=black,
+  rotate=0.0
+]{ 0.000};
+\node at (axis cs:9,9)[
+  scale=0.7,
+  anchor=base,
+  text=white,
+  rotate=0.0
+]{ 1.000};
+\end{axis}
+
+\end{tikzpicture}
