@@ -320,160 +320,210 @@
 % Quotes command
 \newcommand{\quotes}[1]{``#1''}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Jambot %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcommand{\noleftdelimiter}{\left.\kern-\nulldelimiterspace}
-% \usepackage[usestackEOL]{stackengine}
-% \usepackage[bookmarks=false]{hyperref}
-\stackMath
-
-\usepackage{wasysym}
-\usepackage{harmony}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Midi-VAE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\DeclareMathOperator{\lagr}{\mathcal{L}}
-
-\renewcommand{\vec}[1]{\mathbf{#1}}
-
-\newcommand{\setmeterb}[2]{\ensuremath{%
-  \vcenter{\offinterlineskip
-    \halign{\hfil##\hfil\cr
-            $\scriptstyle#1$\cr
-            \noalign{\vskip1pt}
-            $\scriptstyle#2$\cr}
-  }}%
-}
-
-\usepackage{makecell}
-\usepackage{array}
-\newcolumntype{?}{!{\vrule width 1pt}}
-
-\newcommand{\ts}{\textsuperscript}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CycleGAN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\definecolor{tb_color_1}{RGB}{245,124,0}
-\definecolor{tb_color_2}{RGB}{0,167,247}
-
-\pgfplotscreateplotcyclelist{tb}{
-semithick,tb_color_1\\%
-semithick,tb_color_2\\%
-}
-
-\let\mathcup\cup
-\usepackage{musixtex}
-\let\musixcup\cup
-
-\DeclareRobustCommand*{\cup}{%
-  \ifmmode
-    \expandafter\mathcup
-  \else
-    \expandafter\musixcup
-  \fi
-}
-
-
+%%%%%%%%%%%%%%%%% Bribing %%%%%%%%%%%%%%%%%
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage{bibnames}
+\usepackage[title]{appendix}
+\usepackage{listings}
+\usepackage{mathtools}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
-% \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
-%     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\usepackage{tikz}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{listings}
+\usepackage{multirow,array}
+\usepackage[super]{nth}
+\usetikzlibrary{shapes,arrows}
+
+\renewcommand\lstlistingname{Transaction}
+\newcommand{\htlctxn}{\texttt{HTLC\_TXN}}
+\newcommand{\sellertxn}{\texttt{SELLER\_TXN}}
+\newcommand{\bribetxn}{\texttt{BRIBE\_TXN}}
+\newcommand{\refundtxn}{\texttt{REFUND\_TXN}}
+\newcommand{\refuse}{\emph{refuse}}
+\newcommand{\follow}{\emph{follow}}
+\newcommand{\strong}{\emph{strong}}
+\newcommand{\weak}{\emph{weak}}
+
+%%%%%%%%%%%%%%% Atomic Swaps %%%%%%%%%%%%%%%%%
+\usepackage{cite}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
 
 
+\usepackage{mdframed}
+\usepackage{hyperref}
+\usepackage[underline=true]{pgf-umlsd}
+\usepackage{listings}
+\usepackage{color}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CycleGAN ECML Eval %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Crossfit %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage{mwe}
-\usepackage{boldline}
-\usepackage{mathpazo}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Swimming %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage{tikzscale}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NLP Multitasking %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
 \usepackage{adjustbox}
+\usepackage{bibnames}
+\usepackage{empheq}
+\usepackage[title]{appendix}
+\usepackage{listings}
+\usepackage{mathtools}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{varwidth}
+
+\usepackage{tikz}
+\tikzset{
+  font={\fontsize{8pt}{10}\selectfont}}
+\usetikzlibrary{arrows.meta,
+                calc, chains,
+                quotes,
+                positioning,
+                shapes.geometric}
+  
+
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage{multirow,array}
+\usepackage[super]{nth}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[font={small,bf}]{caption}
+\renewcommand\lstlistingname{Transaction}
+\newcommand{\htlctxn}{\texttt{HTLC\_TXN}}
+\newcommand{\sellertxn}{\texttt{SELLER\_TXN}}
+\newcommand{\bribetxn}{\texttt{BRIBE\_TXN}}
+\newcommand{\refundtxn}{\texttt{REFUND\_TXN}}
+\newcommand{\refuse}{\emph{refuse}}
+\newcommand{\follow}{\emph{follow}}
+\newcommand{\strong}{\emph{strong}}
+\newcommand{\weak}{\emph{weak}}
+\newcommand*\phantomrel[1]{\mathrel{\phantom{#1}}}% My preferred typesetting
+
+\pagestyle{plain}
+\floatstyle{boxed}
+\restylefloat{figure}
+
+\floatstyle{boxed}
+\restylefloat{figure}
+
+\pagestyle{plain}
+
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+\addto\captionsenglish{\renewcommand{\figurename}{Algorithm}}
+
+\lstset{
+basicstyle=\ttfamily\footnotesize, 
+frame = single,
+}
+
+\makeatletter
+\renewcommand{\ALG@name}{Protocol}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%% Outpost %%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithm}
+\makeatletter
+\renewcommand{\ALG@name}{Protocol}
+\makeatother
+\usepackage{algorithmic}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{minted}
+\usepackage{listings}
+\usepackage{url}
+\usepackage[super]{nth}
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+    
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+
+%%%%%%%%%%%%%%%%%% TWAP Oracles %%%%%%%%%%%%%%%%%
+\usepackage{cite}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Identifiability in Transformers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepgfplotslibrary{dateplot}
-\usepackage{pdflscape}
+\usepackage{mdframed}
+\usepackage{hyperref}
+\usepackage[underline=true]{pgf-umlsd}
+\usepackage{listings}
+\usepackage{color}
 
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage{adjustbox}
+\usepackage{bibnames}
+\usepackage{empheq}
+\usepackage[title]{appendix}
+\usepackage{listings}
+\usepackage{mathtools}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{varwidth}
 
+\usepackage{tikz}
+\tikzset{
+  font={\fontsize{8pt}{10}\selectfont}}
+\usetikzlibrary{arrows.meta,
+                calc, chains,
+                quotes,
+                positioning,
+                shapes.geometric}
+  
 
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage{multirow,array}
+\usepackage[super]{nth}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[font={small,bf}]{caption}
+\renewcommand\lstlistingname{Transaction}
+\newcommand{\htlctxn}{\texttt{HTLC\_TXN}}
+\newcommand{\sellertxn}{\texttt{SELLER\_TXN}}
+\newcommand{\bribetxn}{\texttt{BRIBE\_TXN}}
+\newcommand{\refundtxn}{\texttt{REFUND\_TXN}}
+\newcommand{\refuse}{\emph{refuse}}
+\newcommand{\follow}{\emph{follow}}
+\newcommand{\strong}{\emph{strong}}
+\newcommand{\weak}{\emph{weak}}
+\newcommand*\phantomrel[1]{\mathrel{\phantom{#1}}}% My preferred typesetting
 
-% Vectors
-\def\vzero{{\bm{0}}}
-\def\vone{{\bm{1}}}
-\def\vmu{{\bm{\mu}}}
-\def\vtheta{{\bm{\theta}}}
-\def\va{{\bm{a}}}
-\def\vb{{\bm{b}}}
-\def\vc{{\bm{c}}}
-\def\vd{{\bm{d}}}
-\def\ve{{\bm{e}}}
-\def\vf{{\bm{f}}}
-\def\vg{{\bm{g}}}
-\def\vh{{\bm{h}}}
-\def\vi{{\bm{i}}}
-\def\vj{{\bm{j}}}
-\def\vk{{\bm{k}}}
-\def\vl{{\bm{l}}}
-\def\vm{{\bm{m}}}
-\def\vn{{\bm{n}}}
-\def\vo{{\bm{o}}}
-\def\vp{{\bm{p}}}
-\def\vq{{\bm{q}}}
-\def\vr{{\bm{r}}}
-\def\vs{{\bm{s}}}
-\def\vt{{\bm{t}}}
-\def\vu{{\bm{u}}}
-\def\vv{{\bm{v}}}
-\def\vw{{\bm{w}}}
-\def\vx{{\bm{x}}}
-\def\vy{{\bm{y}}}
-\def\vz{{\bm{z}}}
+\pagestyle{plain}
+\floatstyle{boxed}
+\restylefloat{figure}
 
-
-% Matrix
-\def\mA{{\bm{A}}}
-\def\mB{{\bm{B}}}
-\def\mC{{\bm{C}}}
-\def\mD{{\bm{D}}}
-\def\mE{{\bm{E}}}
-\def\mF{{\bm{F}}}
-\def\mG{{\bm{G}}}
-\def\mH{{\bm{H}}}
-\def\mI{{\bm{I}}}
-\def\mJ{{\bm{J}}}
-\def\mK{{\bm{K}}}
-\def\mL{{\bm{L}}}
-\def\mM{{\bm{M}}}
-\def\mN{{\bm{N}}}
-\def\mO{{\bm{O}}}
-\def\mP{{\bm{P}}}
-\def\mQ{{\bm{Q}}}
-\def\mR{{\bm{R}}}
-\def\mS{{\bm{S}}}
-\def\mT{{\bm{T}}}
-\def\mU{{\bm{U}}}
-\def\mV{{\bm{V}}}
-\def\mW{{\bm{W}}}
-\def\mX{{\bm{X}}}
-\def\mY{{\bm{Y}}}
-\def\mZ{{\bm{Z}}}
-\def\mBeta{{\bm{\beta}}}
-\def\mPhi{{\bm{\Phi}}}
-\def\mLambda{{\bm{\Lambda}}}
-\def\mSigma{{\bm{\Sigma}}}
-
-\newcommand{\R}{\mathbb{R}}
 
 % custom commands
 \def \effectiveAttnPlotHeight {4.5cm}
@@ -711,9 +761,6 @@ semithick,tb_color_2\\%
 \include{./chapters/conclusion}
 
 \printbibliography
-
-\chapterstart
-\printindex
 
 % Do not print any page numbers (or headers) after this point
 \clearpage  % *after* the last page only
