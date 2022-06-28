@@ -1,10 +1,22 @@
 \chapter{Introduction}  % Motivation
 \label{chap:intro}
 
-\begin{chapquote}{Satoshi Nakamoto}
-  >You will not find a solution to political problems in cryptography.\break
-  Yes, but we can win a major battle in the arms race and gain a new territory of freedom for several years.
+\begin{chapquote}{Anonymous}
+  You will not find a solution to political problems in cryptography.
 \end{chapquote}
+\begin{chapquote}{Satoshi Nakamoto}
+  [Repling to the above] Yes, but we can win a major battle in the arms race and gain a new territory of freedom for several years.
+\end{chapquote}
+
 \vskip 1em
 
-First and foremost, Bitcoin is a political tool. It works because it makes use of cryptography, 
+Settling value between parties is an age old problem that has had many solutions over the years. It evolved to also subsume the related problem of storing value across time. It also subsumed the other related problem of broadcasting the perceived value of something to others. These three can be concisely written as:
+\begin{itemize}
+    \item Medium of exchange.
+    \item Store of value.
+    \item Unit of account.
+\end{itemize}
+The consolidated solution to these problems is often called ``Money''. Money cannot work if the same instance of money can be used to pay two separate people. Money cannot work if it can be arbitrarily created out of nothing. Money cannot work if a third party can prevent the settling of value of between others. These are the double spending, monetary policy, and the censorship-resistance problems. Governments around the world have created their own monies. They typically use the threat of punishment to solve the double spending problem. They assure their citizens that their monetary policy is backed by the full faith and credit of the government. They also assure their citizens that the government does not do censorship resistance. These are political assurances, and like most political assurances, are often not satisfied.
+
+Bitcoin is money that is not issued or controlled by any government. It solves the problems of double spending, monetary policy, and censorship-resistance using a combination of cryptography, distributed systems engineering, and the somewhat complicated notion that people want such a system and are willing to run software that enforces the rules of Bitcoin. The notion that people will run software that enforces the rules of Bitcoin is a bootstrapped social contract that people have with each other. In our research into Bitcoin, we assume that this contract works and the canonical Bitcoin software is run by all its users. 
+

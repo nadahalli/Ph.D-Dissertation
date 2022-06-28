@@ -26,7 +26,7 @@
 	}
 }{
 	\documentclass[11pt,a4paper,oneside,openright,headings=optiontohead]{extreport}
-	% Create watermark on titlepage    
+	% Create watermark on titlepage
     \RequirePackage[firstpage]{draftwatermark}
     \SetWatermarkText{For Review}
     \SetWatermarkLightness{0.8}
@@ -100,7 +100,7 @@
 %\RequirePackage{xcolor}  % for matlab2tikz generated figures  % \definecolor  % package is also included by tikz
 %\RequirePackage{transparent}  % Amazon KDP does not like transparency...
 
-\RequirePackage[labelfont=bf,margin=0cm]{caption} % small: smaller text. font={bf,it}: all bold and italic. textfont=it: text without label italic. justification=centering: center captions. % note: "rotating" package has to be included first 
+\RequirePackage[labelfont=bf,margin=0cm]{caption} % small: smaller text. font={bf,it}: all bold and italic. textfont=it: text without label italic. justification=centering: center captions. % note: "rotating" package has to be included first
 %\DeclareCaptionType{copyrightbox}  % HACK http://tex.stackexchange.com/questions/86603/subcaption-compatibility-with-acm-document-class
 \RequirePackage{subcaption} % better than subfigure and subfig: https://tex.stackexchange.com/questions/13625/subcaption-vs-subfig-best-package-for-referencing-a-subfigure
 %\RequirePackage[list=true,margin=1cm,justification=centering,font=small]{subcaption} % This removes boldness of captions. -> labelfont=bf?
@@ -111,13 +111,6 @@
 % code listings
 \RequirePackage{verbatim}
 \RequirePackage{listings}
-
-% Algorithms
-\RequirePackage{algorithm}
-% Different algorithm environments (algorithmic, algorithmicx + algpseudocode, algorithm2e) -> https://tex.stackexchange.com/questions/229355/algorithm-algorithmic-algorithmicx-algorithm2e-algpseudocode-confused/230789#230789
-%\RequirePackage{algorithmic}
-%\RequirePackage[algo2e,boxed]{algorithm2e}
-\RequirePackage{algpseudocode}  % Cannot be included at the same time as package "algorithmic" or "algorithm2e".  % With algpseudocode (which uses algorithmicx), line breaks do not preserve indentation... (e.g. collective detection receiver)
 
 % text formatting, tables
 %\RequirePackage{extsizes} % BOOKLET to have 9pt size
@@ -157,7 +150,7 @@
 % nice tables
 \RequirePackage{booktabs}  % toprule, midrule, bottomrule, for formal tables
 
-\RequirePackage{schemabloc} 
+\RequirePackage{schemabloc}
 
 % better lists
 \RequirePackage{enumitem}
@@ -320,25 +313,45 @@
 % Quotes command
 \newcommand{\quotes}[1]{``#1''}
 
-%%%%%%%%%%%%%%%%% Bribing %%%%%%%%%%%%%%%%%
-\usepackage{amsmath,amssymb,amsfonts,amsthm}
-\usepackage[english]{babel}
-\usepackage[utf8]{inputenc}
+%%%%%%%%%%%%%%%%% Includes %%%%%%%%%%%%%%%%
+\usepackage{adjustbox}
 \usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
 \usepackage{bibnames}
-\usepackage[title]{appendix}
+\usepackage{caption}
+\usepackage{cite}
+\usepackage{color}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{empheq}
+\usepackage[english]{babel}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage[font={small,bf}]{caption}
+\usepackage{graphicx}
+\usepackage{hyperref}
 \usepackage{listings}
 \usepackage{mathtools}
-\usepackage{float}
-\usepackage{enumitem}
-\usepackage{graphicx}
-\usepackage{textcomp}
-\usepackage{xcolor}
-\usepackage{tikz}
-\usepackage{hyperref}
+\usepackage{mdframed}
 \usepackage{minted}
-\usepackage{listings}
 \usepackage{multirow,array}
+\usepackage[sorting=none]{biblatex}
+\usepackage[super]{nth}
+\usepackage{textcomp}
+\usepackage{tikz}
+\usepackage[title]{appendix}
+\usepackage[underline=true]{pgf-umlsd}
+\usepackage{url}
+\usepackage[utf8]{inputenc}
+\usepackage{varwidth}
+\usepackage{xcolor}
+
+%%%%%%%%%%%%%%%%% Bribing %%%%%%%%%%%%%%%%%
+
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[title]{appendix}
 \usepackage[super]{nth}
 \usetikzlibrary{shapes,arrows}
 
@@ -353,37 +366,13 @@
 \newcommand{\weak}{\emph{weak}}
 
 %%%%%%%%%%%%%%% Atomic Swaps %%%%%%%%%%%%%%%%%
-\usepackage{cite}
-\usepackage{algorithmic}
-\usepackage{graphicx}
-\usepackage{textcomp}
-\usepackage{xcolor}
 
 
-\usepackage{mdframed}
-\usepackage{hyperref}
 \usepackage[underline=true]{pgf-umlsd}
-\usepackage{listings}
-\usepackage{color}
 
-\usepackage{amsmath,amssymb,amsfonts,amsthm}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
-\usepackage{algorithm}
-\usepackage{adjustbox}
-\usepackage{bibnames}
-\usepackage{empheq}
-\usepackage[title]{appendix}
-\usepackage{listings}
-\usepackage{mathtools}
-\usepackage{float}
-\usepackage{enumitem}
-\usepackage{graphicx}
-\usepackage{textcomp}
-\usepackage{xcolor}
-\usepackage{varwidth}
 
-\usepackage{tikz}
 \tikzset{
   font={\fontsize{8pt}{10}\selectfont}}
 \usetikzlibrary{arrows.meta,
@@ -391,25 +380,11 @@
                 quotes,
                 positioning,
                 shapes.geometric}
-  
 
-\usepackage{hyperref}
-\usepackage{minted}
-\usepackage{caption}
-\usepackage{listings}
-\usepackage{multirow,array}
+
 \usepackage[super]{nth}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[font={small,bf}]{caption}
-\renewcommand\lstlistingname{Transaction}
-\newcommand{\htlctxn}{\texttt{HTLC\_TXN}}
-\newcommand{\sellertxn}{\texttt{SELLER\_TXN}}
-\newcommand{\bribetxn}{\texttt{BRIBE\_TXN}}
-\newcommand{\refundtxn}{\texttt{REFUND\_TXN}}
-\newcommand{\refuse}{\emph{refuse}}
-\newcommand{\follow}{\emph{follow}}
-\newcommand{\strong}{\emph{strong}}
-\newcommand{\weak}{\emph{weak}}
 \newcommand*\phantomrel[1]{\mathrel{\phantom{#1}}}% My preferred typesetting
 
 \pagestyle{plain}
@@ -426,7 +401,7 @@
 \addto\captionsenglish{\renewcommand{\figurename}{Algorithm}}
 
 \lstset{
-basicstyle=\ttfamily\footnotesize, 
+basicstyle=\ttfamily\footnotesize,
 frame = single,
 }
 
@@ -435,63 +410,28 @@ frame = single,
 \makeatother
 
 %%%%%%%%%%%%%%%%%%%%% Outpost %%%%%%%%%%%%%%%%%%%%%
-\usepackage{amsmath,amssymb,amsfonts}
-\usepackage{algorithm}
 \makeatletter
 \renewcommand{\ALG@name}{Protocol}
 \makeatother
-\usepackage{algorithmic}
-\usepackage{enumitem}
-\usepackage{float}
-\usepackage{graphicx}
-\usepackage{textcomp}
-\usepackage{xcolor}
-\usepackage{tikz}
-\usepackage{minted}
-\usepackage{listings}
-\usepackage{url}
 \usepackage[super]{nth}
 \AtBeginDocument{%
   \providecommand\BibTeX{{%
     \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
-    
+
 \tolerance=1
 \emergencystretch=\maxdimen
 \hyphenpenalty=10000
 \hbadness=10000
 
 %%%%%%%%%%%%%%%%%% TWAP Oracles %%%%%%%%%%%%%%%%%
-\usepackage{cite}
-\usepackage{algorithmic}
-\usepackage{graphicx}
-\usepackage{textcomp}
-\usepackage{xcolor}
 
 
-\usepackage{mdframed}
-\usepackage{hyperref}
 \usepackage[underline=true]{pgf-umlsd}
-\usepackage{listings}
-\usepackage{color}
 
-\usepackage{amsmath,amssymb,amsfonts,amsthm}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
-\usepackage{algorithm}
-\usepackage{adjustbox}
-\usepackage{bibnames}
-\usepackage{empheq}
 \usepackage[title]{appendix}
-\usepackage{listings}
-\usepackage{mathtools}
-\usepackage{float}
-\usepackage{enumitem}
-\usepackage{graphicx}
-\usepackage{textcomp}
-\usepackage{xcolor}
-\usepackage{varwidth}
 
-\usepackage{tikz}
 \tikzset{
   font={\fontsize{8pt}{10}\selectfont}}
 \usetikzlibrary{arrows.meta,
@@ -499,26 +439,11 @@ frame = single,
                 quotes,
                 positioning,
                 shapes.geometric}
-  
 
-\usepackage{hyperref}
-\usepackage{minted}
-\usepackage{caption}
-\usepackage{listings}
-\usepackage{multirow,array}
+
 \usepackage[super]{nth}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[font={small,bf}]{caption}
-\renewcommand\lstlistingname{Transaction}
-\newcommand{\htlctxn}{\texttt{HTLC\_TXN}}
-\newcommand{\sellertxn}{\texttt{SELLER\_TXN}}
-\newcommand{\bribetxn}{\texttt{BRIBE\_TXN}}
-\newcommand{\refundtxn}{\texttt{REFUND\_TXN}}
-\newcommand{\refuse}{\emph{refuse}}
-\newcommand{\follow}{\emph{follow}}
-\newcommand{\strong}{\emph{strong}}
-\newcommand{\weak}{\emph{weak}}
-\newcommand*\phantomrel[1]{\mathrel{\phantom{#1}}}% My preferred typesetting
 
 \pagestyle{plain}
 \floatstyle{boxed}
@@ -538,7 +463,7 @@ frame = single,
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Layout/Appearance %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\interfootnotelinepenalty=10000 % this helps avoid linebreaks in footnotes which make latex die and throw mostly undebuggable errors: http://tug.org/pipermail/pdftex/2002-February/002216.html and http://tex.stackexchange.com/questions/32208/footnote-runs-onto-second-page 
+\interfootnotelinepenalty=10000 % this helps avoid linebreaks in footnotes which make latex die and throw mostly undebuggable errors: http://tug.org/pipermail/pdftex/2002-February/002216.html and http://tex.stackexchange.com/questions/32208/footnote-runs-onto-second-page
 \RequirePackage[all]{nowidow} % try to avoid widows and orphans, https://tex.stackexchange.com/questions/4152/how-do-i-prevent-widow-orphan-lines, https://texfaq.org/FAQ-widows
 % the acmart class just does \widowpenalty=10000 \clubpenalty=10000 \brokenpenalty=10000
 
@@ -611,7 +536,7 @@ frame = single,
 % No header for chapter title pages (pagestyle)
 \makeatletter
 \renewcommand\chapter{%
-%  \if@openright\cleardoublepage\else\clearpage\fi  % Since cleardoublepage redefined above, always calling cleardoublepage is sufficient.  
+%  \if@openright\cleardoublepage\else\clearpage\fi  % Since cleardoublepage redefined above, always calling cleardoublepage is sufficient.
   %\chapterstart  % cannot do this here, because for first chapter, need to set page counter to 1 after this
   \thispagestyle{plain}%  % no headers for the first page of a chapter
   \global\@topnum\z@
@@ -667,20 +592,7 @@ frame = single,
 % Large bullet points for itemize
 \renewcommand\labelitemi{\LARGE\textbullet}  % \raisebox{-1pt}{\textbullet} to center on non-capital letters
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Debug %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Meaningful log messages for changing labels
-%   Prints "label XYZ changed: ..."
-%   From https://tex.stackexchange.com/questions/154594/how-to-diagnose-a-permanent-labels-may-have-changed-warning
-\def\@testdef #1#2#3{%
-  \def\reserved@a{#3}\expandafter \ifx \csname #1@#2\endcsname
- \reserved@a  \else
-\typeout{^^Jlabel #2 changed:^^J%
-\meaning\reserved@a^^J%
-\expandafter\meaning\csname #1@#2\endcsname^^J}%
-\@tempswatrue \fi}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Bibliography %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[sorting=none]{biblatex}
 \bibliography{references}
 
