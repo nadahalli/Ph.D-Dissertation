@@ -1,0 +1,44 @@
+\chapter{Introduction}  % Motivation
+\label{chap:intro}
+
+\begin{chapquote}{Anonymous}
+  You will not find a solution to political problems in cryptography.
+\end{chapquote}
+\begin{chapquote}{Satoshi Nakamoto}
+  [Repling to the above] Yes, but we can win a major battle in the arms race and gain a new territory of freedom for several years.
+\end{chapquote}
+
+\vskip 1em
+
+\section{Bitcoin is Money}
+Settling value between parties is an age old problem that has had many solutions over the years. It evolved to subsume the related problem of storing value across time. It also subsumed the other related problem of broadcasting the perceived value of something to others. These three can be concisely written as:
+\begin{itemize}
+    \item Medium of exchange.
+    \item Store of value.
+    \item Unit of account.
+\end{itemize}
+The consolidated solution to these problems is often called ``Money''. Money cannot work if the same instance of money can be used to pay two separate people. Money cannot work if it can be arbitrarily created out of nothing. Money cannot work if a third party can prevent the settling of value of between others. These are the double spending, monetary policy, and the censorship-resistance problems respectively. Historically, governments around the world have created their own monies and as such, have complete control over how money works in their jurisdiction. They typically use the threat of punishment to solve the double spending problem. They assure their citizens that their monetary policy is backed by the full faith and credit of the government. They also assure their citizens that the government does not censors transactions arbitrarily. These are political assurances, and like most political assurances, are often not satisfied.
+
+Bitcoin is money that is not issued or controlled by any government. It solves the problems of double spending, monetary policy, and censorship-resistance using a combination of cryptography, distributed systems engineering, and the somewhat complicated notion that people want such a system and are willing to run software that enforces the rules of Bitcoin. The notion that people will run software that enforces the rules of Bitcoin is a bootstrapped social contract that people have with each other. In our research into Bitcoin, we assume that this social contract works and all interested users run the canonical Bitcoin software. We focus our research on problems like censorship resistance, privacy, and scalability from a technical perspective.
+
+\section{Censorship Resistance}
+In the world of traditional money, cash transactions are hard to censor. Governments censor cash transactions by placing barriers to cash transactions irrespective of their legality. Such barriers commonly include limits on value of cash transactions, demonetization of entire sets of cash bills, limits on how much cash any individual can hold, etc. 
+
+Digital transactions, on the other hand, are routinely censored if they are deemed to be illegal. Typically, governments send censorship ``orders'' to regulated financial intermediaries like banks, clearing houses, and payment gateways. These intermediaries reconfigure their software to implement the censorship. Censorship orders are either specific to certain users or certain types of transactions. Users are tied to their financial intermediary and the cost of switching intermediaries is prohibitively expensive, if not impossible. For example, a user can switch their bank account to a more favorable bank. But if the user is censored at the government controlled payments gateway, switching gateways is not an option - as there is typically only one such gateway. Governments' legal control over intermediaries makes censorship of traditional transactions effective.
+
+Bitcoin transactions are broadcast into the peer to peer network by users, and are eventually confirmed by being included in a block by some miner. The peer to peer network of users and miners are spread across the world in many jurisdictions. A transaction can offer a specific fee denominated in bitcoin, the currency. This fee (or lack thereof) is the main incentive that miners have to include a transaction in the next block they are mining. If the fee is low, the transaction gets ignored by miners. If the fee is high, the transaction is included in their next block by some miner.
+
+Even if some miner decides to censor some transactions, the transaction itself is globally censored only if 50\% all the mining hashpower decides to censor it. Bitcoin's double-spending protection also works only if 50\% of the all the mining hashpower decide to not go along with a double-spending attack. The requirement that greater than 50\% of the mining hashpower is not colluding together to accomplish a specific objective is essential to Bitcoin's functioning. Crucially, unlike in traditional finance, the user is not tied to their intermediary - in this case, any single miner. Any miner willing to pick up a transaction is enough for it to get confirmed eventually - given that more than 50\% of the mining hashpower is ambivalent about this transaction.
+
+In Chapter \ref{chapter:bribing}, we ask whether miners can be financially motivated to censor transactions. There is a type of Bitcoin smart contract called Hashed Timelock Contract (HTLC) which binds two parties into spending some bitcoin in a specific way. An HTLC is justly enforced when only one of the parties is able to get a followup transaction confirmed. If both parties try to get their own followup transactions confirmed, we have a race condition where one party is incentivized to censor the other by outbidding them on fees. The HTLC smart contract solves this by timelocking one of the spending arms of the contract and hashlocking the other arm. HTLC's are more formally defined in the background section of Chapter \ref{chap:background}. If the hashlock arm opens up, it is valid immediately as per Bitcoin's consenus rules. The timelocked arm becomes valid when the timelock expires. 
+
+We ask if the timelocked arm can bribe miners to censor a valid hashlocked arm till the timelock runs out. Our result indicates that the hashlocked arm can offer slightly more fees (as a percentage of the bribe) than the percentage of hashpower controlled by the weakest known miner, and can avoid censorship. We also derive the length of the timelock $T$ that goes along with the ratio of the hashlock arm fees $f$ and the bribe value $b$.
+
+\section{Privacy}
+
+\section{Scalability}
+
+\section{Conservative Design}
+
+\section{Why Bitcoin Matters}
+
