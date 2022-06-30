@@ -322,7 +322,6 @@
 \usepackage{caption}
 \usepackage{cite}
 \usepackage{color}
-\usepackage[colorinlistoftodos]{todonotes}
 \usepackage{empheq}
 \usepackage[english]{babel}
 \usepackage{enumitem}
@@ -345,6 +344,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{varwidth}
 \usepackage{xcolor}
+\usepackage{csquotes}
 
 %%%%%%%%%%%%%%%%% Bribing %%%%%%%%%%%%%%%%%
 
@@ -442,7 +442,6 @@ frame = single,
 
 
 \usepackage[super]{nth}
-\usepackage[colorinlistoftodos]{todonotes}
 \usepackage[font={small,bf}]{caption}
 
 \pagestyle{plain}
@@ -665,7 +664,11 @@ frame = single,
 \include{./chapters/2.bribing}
 
 \chapterstart
-\include{./chapters/3.swaps}
+\include{./chapters/3.1.coinjoins}
+
+\chapterstart
+\include{./chapters/3.2.swaps}
+
 
 \chapterstart
 \include{./chapters/4.outpost}

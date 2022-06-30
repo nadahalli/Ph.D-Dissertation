@@ -1,4 +1,37 @@
 \chapter{Background}  % Motivation
 \label{chap:background}
 
+\begin{chapquote}{Satoshi Nakamoto}
+The nature of Bitcoin is such that once version 0.1 was released, the core design was set in stone for the rest of its lifetime. 
+\end{chapquote}
+
 \section{How Bitcoin Works}
+The word ``Bitcoin'' is used to represent all of the following:
+\begin{itemize}
+    \item A specific computer program.
+    \item A peer to peer network of nodes that run the program.
+    \item The protocol that governs how these nodes operate with each other.
+    \item The numerical value that is transferred through the network based on the rules of the program. We will use bitcoin with a lower case ``b'' to refer to this numeric unit.
+\end{itemize}
+
+Satoshi Nakamoto released the first version \cite{satoshi_bitcoin_release_0_1_0} of the software in January 2009, and also ran the software on a computer that he controlled. He was soon joined by Hal Finney, who ran the same software and connected the software instance running on his computer (his node) to Nakamoto's node using classic a TCP/IP network connection. Later, other users started running the same software and connected to this growing peer to peer network. Crucially, anyone who has access to a computer and the internet can run the software and connect to the Bitcoin network. 
+
+\section{What does a Bitcoin node do?}
+Note that this section will feature definitions where some of the terms used in the definition are themselves defined later on. Such terms will be italicized. 
+
+Like any complex piece of software, a Bitcoin node does a variety of things. When it starts fresh, it connects to other Bitcoin nodes over the standard networking stack to download the Bitcoin \textit{blockchain} to synchronize itself to the current global state of Bitcoin. The blockchain is the database of every historical \textit{transaction} that has happened in Bitcoin since Nakamoto's famous first transaction that gave him the ability to spend 50 bitcoins. 
+
+A Bitcoin transaction refers to one or more previous Bitcoin transactions, which are called its inputs. It also has one or more outputs, which are a combination of some bitcoin value and a \textit{spending condition} that locks this output. The total sum of output value should not exceed the total sum of the input values. The base case of such a recursive definition of transactions is the so called coinbase transaction, which has no inputs. Its value comes from the protocol, where fresh bitcoins are minted every \textit{block} and given to the \textit{miner} who \textit{mines} that block. The difference in bitcoin value between the inputs and outputs are also added to the coinbase transaction's initial value.
+
+A Bitcoin block is a set of transactions that is accepted by every node running Bitcoin as probabilistically confirmed.
+
+A miner is a special Bitcoin node that watches the peer to peer network for new transactions that are flowing through the system
+
+\subsection{HTLC}
+
+\section{Bitcoin's Transaction Notation}
+
+\section{Lightning Network}
+
+
+
