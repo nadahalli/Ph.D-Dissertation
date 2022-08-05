@@ -1,37 +1,45 @@
 \chapter{Timelocked Bribing}  % Motivation
+\markboth{Timelocked Bribing}{}
 \label{chapter:bribing}
 
 \section{Introduction}
-Bitcoin removes trusted financial intermediaries and replaces them with a dynamic set of miners. These miners validate transactions and are paid by the system in the form of block rewards and also by transaction participants in the form of fees. Rational miners will always choose higher-fee transactions than lower-fee ones, and this behavior will get reinforced over time as block rewards decrease to zero \cite{bonneau2015sok}. This setup has often raised (\cite{feather_forking} \cite{whale_transactions} \cite{smart_contracts_for_bribing}) the possibility of miners being bribed by transaction participants to favor one participant over the other. Typical bribing attacks envision the paying party (Alice) cheating the paid party (Bob) by Alice double-spending the same value in a separate transaction paying back to Alice. Miners are bribed by Alice to include the double-spending transaction in the blockchain by forking it and orphaning the block with the first transaction, thereby cheating Bob of the payment from the first transaction. These bribery attacks, however, operate at a block level because, to be cheated, Bob needs to be convinced that the first transaction is buried in the blockchain by $k$ blocks (in Bitcoin, $k=6$). Before this happens, Bob should ideally not honor the first transaction, but monitor the public Bitcoin blockchain. If a transaction where Alice double-spends the same bitcoins back to herself is seen, and Bob's transaction is abandoned in an orphaned block, Bob should not honor Alice's first transaction by not giving Alice the goods and services that were promised.
+In traditional finance, transactions are finalized by institutions who give authoritative statements that certain transactions are final, and users can take these institutional guarantees as evidence in a court of law if there are disputes. Similarly, if someone is not allowed to transact on platforms, that is, they are censored, they can ask redressal from a court of law. If the censorship is enacted by the government in question, the user has little recourse.
 
-A more sophisticated concept of transactions exists where Bob \emph{does} want Alice to pay the transaction value back to herself, but only after some time has elapsed. During this time, Bob reserves the option of getting paid himself from the same payment source. This complex transaction structure is the building block for financial contracts like escrows, payment channels, atomic swaps, etc. The required time delay is implemented using a blockchain artefact called \emph{timelocks}. A rudimentary version of timelocks (nLocktime) was in the first Bitcoin implementation by Satoshi Nakamoto in 2009 \cite{satoshi_bitcoin_release_0_1_0}. More sophisticated timelocks that lock transactions, specific bitcoins, or specific script execution paths were added later \cite{BIP68} \cite{BIP65} \cite{BIP112}. Bitcoin script allows for timelocks to be combined with hashlocks in an OR condition to create a new kind of transaction called Hash Timelocked Transactions (HTLC). As we will see later, HTLC's open the possibility of transaction level bribing of miners where miners do not have to orphan mined blocks, but just have to ignore a \emph{currently valid} transaction and wait for the timelocked bribe to become valid. Additionally, in this attack, the bribe is endogenous to the transactions and does not have to be implemented externally through public bulletin boards or other third party smart contracts. Bribery attacks that operate at a transaction level are far more insidious compared to block orphaning bribery attacks. Block orphaning attacks undermine the native cryptocurrency's trust with the larger community and could be detrimental to the briber's financial position in general. Transaction level bribery, on the other hand, targets specific contracts on the blockchain and could go unnoticed as the larger cryptocurrency system hums along. This sort of an attack, where a miner has visibility into the pool of transactions that are waiting for confirmation (mempool) and can include or not include a transaction in their mined block is discussed in a more general setting in \cite{daian2020flash} under the umbrella term ``Miner Extractable Value''.
+As an alternative medium of exchange, Bitcoin removes trusted financial intermediaries and replaces them with a dynamic set of miners. These miners validate transactions and are paid by the system in the form of block rewards and also by transaction participants in the form of fees. The entire set of miners, collectively, have no incentive to censor any particular transaction. Even if governments wanted to censor some transactions, there is no easy way to get this message across to all miners. Any miner including such a transaction in their block is enough to thwart the censorship. More than 50\% of miners have to abandon that block to effectively censor the transaction. In other words, Bitcoin achieves censorship resistance if more than 50\% miners act rationally. 
 
-\subsection{HTLC}
-HTLC's are a type of smart contract that use preimage resistance of cryptographic hash functions, along with timelocks, to enable an escrow service. Say we have a buyer who has some bitcoin and wants to buy some goods/services from a seller. The buyer commits their bitcoin into a contract which is locked by an OR condition of:
-\begin{itemize}
-    \item Preimage to a cryptographic hash. This is the payment path. The buyer creates a random secret preimage and cryptographically hashes it to get a digest. This digest is used to lock the payment path. The buyer will reveal the preimage to the seller once the buyer has possession of the goods/services. The seller can use this preimage and their own signature to send the funds to an address they control. The exchange of the preimage for the goods/services can be implemented in a variety of ways, leading to different applications.
-    \item A timelock. This is the refund path. The buyer sets a timelock after which the funds are refunded back. This path is to ensure that the funds do not get locked in the contract if the seller aborts. 
-\end{itemize}
+In this chapter, we look at whether there are some Bitcoin transactions that rational miners might be incentivized to censor. Rational miners will always choose higher-fee transactions than lower-fee ones, and this behavior will get reinforced over time as block rewards decrease to zero \cite{bonneau2015sok}. This setup has often raised (\cite{feather_forking} \cite{whale_transactions} \cite{smart_contracts_for_bribing}) the possibility of miners being bribed by transaction participants to favor one participant over the other. Typical bribing attacks envision the paying party (Alice) cheating the paid party (Bob) by Alice double-spending the same value in a separate transaction paying back to Alice. Miners are bribed by Alice to include the double-spending transaction in the blockchain by forking it and orphaning the block with the first transaction, thereby cheating Bob of the payment from the first transaction. These bribery attacks, however, operate at a block level because, to be cheated, Bob needs to be convinced that the first transaction is buried in the blockchain by $k$ blocks (in Bitcoin, $k=6$). Before this happens, Bob should ideally not honor the first transaction, but monitor the public Bitcoin blockchain. If a transaction where Alice double-spends the same bitcoins back to herself is seen, and Bob's transaction is abandoned in an orphaned block, Bob should not honor Alice's first transaction by not giving Alice the goods and services that were promised.
 
-This transaction (\htlctxn{}) is broadcast and is confirmed on the Bitcoin blockchain to a sufficient depth to be considered finalized. The seller then exchanges their goods and services for the preimage of the hash from the buyer. This exchange process is independent of the transaction itself. Each application that uses HTLC's has its own way of doing this exchange. For example, Atomic Swaps rely on another public blockchain to reveal the secret preimage. After the exchange is done, the seller will attempt to move the UTXO created in \htlctxn{}'s payment path to an address that the seller controls with a simpler unencumbered transaction (\sellertxn{}) that uses the seller's signature and the preimage received from the buyer. If the exchange is not done, the buyer waits for the timelock to expire, and uses the \refundtxn{} to send the funds back to themselves.
+As we saw in the background section in Chapter \ref{chap:background}, HTLC's are a more sophisticated type of transaction where Bob \emph{does} want Alice to pay the transaction value back to herself, but only after some time has elapsed. During this time, Bob reserves the option of getting paid himself from the same payment source. HTLC's are the building blocks for financial contracts like escrows, payment channels, atomic swaps, etc. The required time delay is implemented using a blockchain artefact called \emph{timelocks}. A rudimentary version of timelocks (nLocktime) was in the first Bitcoin implementation by Satoshi Nakamoto in 2009 \cite{satoshi_bitcoin_release_0_1_0}. More sophisticated timelocks that lock transactions, specific bitcoins, or specific script execution paths were added later \cite{BIP68} \cite{BIP65} \cite{BIP112}. Bitcoin script allows for timelocks to be combined with hashlocks in an OR condition to create Hash Timelocked Transactions (HTLC). As we will see later, HTLC's open the possibility of transaction level bribing of miners where miners do not have to orphan mined blocks, but just have to ignore a \emph{currently valid} transaction and wait for the timelocked bribe to become valid. Additionally, in this attack, the bribe is endogenous to the transactions and does not have to be implemented externally through public bulletin boards or other third party smart contracts. Bribery attacks that operate at a transaction level are far more insidious compared to block orphaning bribery attacks. Block orphaning attacks undermine the native cryptocurrency's trust with the larger community and could be detrimental to the briber's financial position in general. Transaction level bribery, on the other hand, targets specific contracts on the blockchain and could go unnoticed as the larger cryptocurrency system hums along. This sort of an attack, where a miner has visibility into the pool of transactions that are waiting for confirmation (mempool) and can include or not include a transaction in their mined block is discussed in a more general setting in \cite{daian2020flash} under the umbrella term ``Miner Extractable Value''.
 
 \subsection{Bribing Attack}
 
-The attack can begin after the \htlctxn{} is confirmed and the buyer already has the goods/services for which the buyer committed the funds for. If the buyer acts in good faith and does nothing, there is no attack. If the buyer acts in bad faith, the buyer will try to censor \sellertxn{} from being included in any future block. The buyer broadcasts the \refundtxn{} (which sends the funds back to the buyer) and chains it with a \bribetxn{}, which sends the funds from the buyer to any miner who mines it by leaving the output field empty. Note that in the \bribetxn{}, the buyer can send an $\epsilon$ amount to themselves. This makes the bribe not just a griefing attack (where the attacker does not profit), but marginally profitable. Also note that \sellertxn{} and the pair [\refundtxn{}, \bribetxn{}] spend the same UTXO and are inherently incompatible. If one of them is confirmed on the blockchain, the other becomes invalid. In the rest of this paper, we will use \bribetxn{} and the pair [\refundtxn{}, \bribetxn{}] interchangeably. Pseudo-code for these transactions are in Appendix \ref{appendex:transactions}. 
+The attack can begin after the \htlctxn{} is confirmed and the buyer already has the goods/services for which the buyer committed the funds for. If the buyer acts in good faith and does nothing, there is no attack. If the buyer acts in bad faith, the buyer will try to censor \sellertxn{} from being included in any future block. The buyer broadcasts the \refundtxn{} (which sends the funds back to the buyer) and chains it with a \bribetxn{}, which sends the funds from the buyer to any miner who mines it by leaving the output field empty. Note that in the \bribetxn{}, the buyer can send an $\epsilon$ amount to themselves. This makes the bribe not just a griefing attack (where the attacker does not profit), but marginally profitable. Also note that \sellertxn{} and the pair [\refundtxn{}, \bribetxn{}] spend the same UTXO and are inherently incompatible. If one of them is confirmed on the blockchain, the other becomes invalid. In the rest of this paper, we will use \bribetxn{} and the pair [\refundtxn{}, \bribetxn{}] interchangeably. Pseudo-code for these transactions are in Figure \ref{fig:bribe_txn}.
+
+\begin{figure}[!htb]
+    \centering
+    \caption{HTLC followed by Bribe}
+    \label{fig:bribe_txn}
+\begin{align*}
+    \htlctxn{} &= [(P|\sigma_b)] \mapsto [(P|(\sigma_b \land \Delta) \lor (\sigma_s \land H_{s}))] \\
+    \sellertxn{} &= [(P|(\sigma_s \land s))] \mapsto [(P|\sigma_s)] \\
+    \refundtxn{} &= [(P|(\sigma_b\land \Delta))] \mapsto [(P|\sigma_b)] \\
+    \bribetxn{} &= [(P|\sigma_b)] \mapsto [(\epsilon|\sigma_b)]
+\end{align*}
+\end{figure}
 
 Bitcoin's consensus rules govern what transactions can be included in a block by miners, but does not say anything about what transactions miners can or cannot ignore. It gives the benefit of the doubt to miners, allowing the possibility that miners have not seen a specific transaction because of network delays/failures. Miners could be (or not be) interested in a transaction because its fees are high (or low). In our attack scenario, miners see \sellertxn{} and \bribetxn{} at the same time. But as per the consensus rules, miners cannot include \bribetxn{} immediately because it is timelocked. But crucially, there is no obligation to include the \sellertxn{} immediately either. As blocks go by, \bribetxn{} becomes valid and can be included in the blockchain and  \sellertxn{} is censored, with the sale proceeds going to the miners and the buyer, but not to the seller. The seller could increase their fees to compete with the timelocked bribe, but that would come out of their own pocket, as they have already handed out the goods and services to the buyer.
 
 In the following sections, we show how the two main applications of HTLC's: Lightning Payment Channels and Atomic Swaps, are both vulnerable to this bribing attack.
 
 \subsection{Payment Channels}
-Payment channels \cite{decker_wattenhofer}, \cite{poon_dryja} are a promising solution to the scalability problem in cryptocurrencies like Bitcoin and Ethereum, which have low transaction throughputs. Lightning Network's \cite{poon_dryja} payment channels rely on HTLC's to enforce the revocation of older commitment transactions. In our attack scenario, Alice and Bob have a payment channel that they have updated over time using many commitment transactions. Both Alice and Bob keep their own copy of the commitment transaction, where their copy can be broadcast by them, and will lock their side of the channel balance with an HTLC and the counterparty's side with a regular payment. This means that in the case of a channel closure, the broadcaster has to wait for his payment, but the counterparty can withdraw funds immediately. Without loss of generality, we can assume that in one such update ($u_1$), the entire channel balance was in Bob's favor, and Alice has zero balance in her favor. In a subsequent update ($u_2$), Alice delivers some goods/services to Bob, and after $u_2$, the entire channel balance is in Alice's favor and Bob has zero balance on his side of the channel. As a part of the Lightning Protocol, during $u_2$'s negotiation, Bob gives Alice the preimage ($p_1$) of a hash that lets her punish him if $u_1$ ever makes it to the blockchain. 
+As we saw in the background section in Chapter \ref{chap:background}, payment channels \cite{decker_wattenhofer}, \cite{poon_dryja} are a promising solution to the scalability problem in Bitcoin. Lightning Network's \cite{poon_dryja} payment channels rely on HTLC's to enforce the revocation of older commitment transactions (\ctx{}'s). In our attack scenario, Alice and Bob have a payment channel that they have updated over time using many (\ctx{}'s). Both Alice and Bob keep their own copy of their \ctx{}'s, where their copy can be broadcast by them, and will lock their side of the channel balance with an HTLC and the counterparty's side with a regular payment. This means that in the case of a channel closure, the broadcaster has to wait for his payment, but the counterparty can withdraw funds immediately. Without loss of generality, we can assume that in one such update ($u_1$), the entire channel balance was in Bob's favor, and Alice has zero balance in her favor. In a subsequent update ($u_2$), Alice delivers some goods/services to Bob, and after $u_2$, the entire channel balance is in Alice's favor and Bob has zero balance on his side of the channel. As a part of the Lightning Protocol, during $u_2$'s negotiation, Bob gives Alice the preimage ($p_1$) of a hash that lets her punish him if $u_1$ ever makes it to the blockchain. 
 
-The briber (in our case, Bob) broadcasts an outdated commitment transaction $u_1$ (called Revoked Commitment Transaction in Lightning). This has one output which is an HTLC. He then follows it up by broadcasting the bribing transaction: \bribetxn. Note that the \bribetxn{} is timelocked and should be invalid till the timelock expires. The victim (Alice in our case), sees $u_1$ on the blockchain, and using her knowledge of the revocation preimage, sends the corresponding \sellertxn{} (called Breach Remedy Transaction in Lightning) to the pool of transactions to be included in the blockchain, Note that \sellertxn{} should be valid immediately as it has no timelock on it. But if all miners wait for the \bribetxn{}'s timelock to expire, and during that time ignore the \sellertxn{}, the bribing attack is successful. The amount that goes from the \bribetxn{} to the miner does not matter to Bob because he already has the equivalent goods/services from Alice for that value. Therefore, he is bribing with what he has already spent.
+The briber (in our case, Bob) broadcasts an outdated \ctx{} $u_1$ (called Revoked Commitment Transaction in Lightning). This has one output which is an HTLC. He then follows it up by broadcasting the bribing transaction: \bribetxn. Note that the \bribetxn{} is timelocked and should be invalid till the timelock expires. The victim (Alice in our case), sees $u_1$ on the blockchain, and using her knowledge of the revocation preimage, sends the corresponding \sellertxn{} (called Breach Remedy Transaction in Lightning) to the pool of transactions to be included in the blockchain. At this time, \sellertxn{} should be valid as it has no timelock on it. But if all miners wait for the \bribetxn{}'s timelock to expire, and during that time ignore the \sellertxn{}, the bribing attack is successful. The amount that goes from the \bribetxn{} to the miner does not matter to Bob because he already has the equivalent goods/services from Alice for that value. Therefore, he is bribing with what he has already spent.
 
-Lightning Network uses HTLC's to also implement payment hops from, say, Alice to Bob through Carol - where Alice and Bob do not have a direct payment channel between each other, but both have a channel to Carol. HTLC's are used here to ensure that Carol can use her channels to send funds from Alice to Bob without Carol's own funds being put at risk. Either the entire payment goes through from Alice to Bob through Carol (who gets the routing fees), or the entire payment is aborted, and all parties retain their own pre-payment balances. Using a series of messages \cite{bolt_3}, Alice, Bob, and Carol communicate using an off-chain protocol and negotiate a series of commitment transactions that each have an additional HTLC that sends the new payment from Alice to Bob through Carol. These HTLC's have a different payment specific secret preimage and its associated hash that locks the hashlock arm of the HTLC. They also have a lower timeout value (compared to the channel's timeout value) that refunds this particular payment back to the source in case any other node along the payment route aborts the payment. These hops do not affect the bribing attack model: an outdated commitment transaction can still be broadcast by the briber and the victim has to respond.
+Lightning Network uses HTLC's to also implement payment hops from, say, Alice to Bob through Carol - where Alice and Bob do not have a direct payment channel between each other, but both have a channel to Carol. HTLC's are used here to ensure that Carol can use her channels to send funds from Alice to Bob without Carol's own funds being put at risk. Either the entire payment goes through from Alice to Bob through Carol (who gets the routing fees), or the entire payment is aborted, and all parties retain their own pre-payment balances. Using a series of messages \cite{bolt_3}, Alice, Bob, and Carol communicate using an off-chain protocol and negotiate a series of commitment transactions that each have an additional HTLC that sends the new payment from Alice to Bob through Carol. These HTLC's have a different payment specific secret preimage and its associated hash that locks the hashlock arm of the HTLC. They also have a lower timeout value (compared to the channel's timeout value) that refunds this particular payment back to the source in case any other node along the payment route aborts the payment. These hops do not affect the bribing attack model: an outdated \ctx{} can still be broadcast by the briber and the victim has to respond.
 
 \subsection{Atomic Swaps}
-Atomic Swaps are a way to exchange cryptocurrencies between two separate public blockchain systems (say, between Bitcoin and Litecoin) without involving a trusted third party \cite{herlihy2018atomic}, \cite{atomic_swaps_american_call_options}. TierNolan's classic Atomic Swap construction \cite{atomic_swap} relies on two \htlctxn's to get around the trusted third party. Alice and Bob have their own \htlctxn's in the blockchains whose assets they have. These \htlctxn's will enable corresponding \sellertxn{}'s to the other party and \refundtxn{}'s to themselves. Alice initiates her side of the swap by publishing an HTLC on her blockchain which has a timelock of $2\cdot t$ and hash of a secret preimage that only she knows. Bob accepts the swap by publishing his own HTLC on his blockchain with a timelock of $1\cdot t$ and the same hash whose preimage he \emph{does not} know. Alice then redeems Bob's HTLC by revealing her secret through a \sellertxn{} on Bob's blockchain. Bob's knowledge of this secret (by monitoring Bob's public blockchain) enables Bob to publish his own \sellertxn{} on Alice's blockchain, thereby completing the swap. 
+As we saw in the background section in Chapter \ref{chap:background}, Atomic Swaps are a way to exchange cryptocurrencies between two public blockchain systems (say, between Bitcoin and Litecoin, or between Bitcoin and Bitcoin) without involving a trusted third party \cite{herlihy2018atomic}, \cite{atomic_swaps_american_call_options}. Here, we describe TierNolan's classic Atomic Swap construction \cite{atomic_swap} based on the HTLC's used in it. Alice and Bob have their own \htlctxn's in the blockchains whose assets they have. These \htlctxn's will enable corresponding \sellertxn{}'s to the other party and \refundtxn{}'s to themselves. Alice initiates her side of the swap by publishing an HTLC on her blockchain which has a timelock of $2\cdot t$ and hash of a secret preimage that only she knows. Bob accepts the swap by publishing his own HTLC on his blockchain with a timelock of $1\cdot t$ and the same hash whose preimage he \emph{does not} know. Alice then redeems Bob's HTLC by revealing her secret through a \sellertxn{} on Bob's blockchain. Bob's knowledge of this secret (by monitoring Bob's public blockchain) enables Bob to publish his own \sellertxn{} on Alice's blockchain, thereby completing the swap. 
 
 In the atomic swap described above, Alice can try to censor Bob's \sellertxn{} with her own \bribetxn{} on her blockchain that lets her keep assets on Bob's blockchain, and leave most of her bribing profits on her own blockchain to miners. This way, Alice only profits if her attack succeeds, and has no possibility of a loss. Ideally, this should not be possible because Bob's \sellertxn{} is valid from the moment he gets to know of Alice's secret preimage, and Alice's \bribetxn{} is invalid at that time. But if all miners are made aware of Alice's \bribetxn{}, the bribing attack might succeed.
 
@@ -151,159 +159,16 @@ Recollect that, if all the miners are strong, the bribing game is not safe no ma
   which is strictly more than its expected payoff. In the second possibility where $M$ is not selected as the leader of stage~1, the game remains identical to the original case where $M$ plays \follow{}. This implies that $M$ is better off playing \refuse{} in the first stage, which concludes the proof. We remark that this result does not imply that $M$ is better off playing \refuse{} in every stage. In fact, as the game proceeds to new stages, the expected payoff of $M$ can change, and  $M$ may choose to play \follow{}.
   
 \end{proof}
+
 \subsection{The elimination of dominated strategies of strong miners}
-A bribing game with parameters $f$ and $b$ may be safe for a significantly smaller $T$ than what is given in Theorem~\ref{equ:minT}. In its proof, we eliminated only strictly dominated strategies of weak miners. In principle, we can continue the process by eliminating strictly dominated strategies of strong miners as well. To do so, we can first sort the strong miners according to their selection probabilities. Starting with the strong miner with the smallest selection probability, and an upper bound of $T$ from Theorem~\ref{equ:minT}, we can calculate the minimum number of initial stages in which the miner is strictly better off playing \refuse{}. We then eliminate the strictly dominated strategies of that miner, and move to the next strong miner. At the end of this iterated elimination process, if all miners play \refuse{} in the first stage, then the game is proven to be safe. As we iterate from time period 0 to time period $T$, the value of $t$ where all miners play refuse for the \textit{last} time shows us that if we had begun the game at this point, the game would have been safe in the first stage itself. This new starting point of the game results in the new ending point being at $T_{new} = T_{old} - t$. In this new setting, the game is safe in the first stage. The actual algorithm to find $t$ and an accompanying worked example are presented in Appendix \ref{appendex:algorithm}. $T_{new}$ is lower than $T$, and now, with just one weak miner, and elimination of dominated strategies of all miners, the game is safe for lower values of $T$. This lower value of $T$ makes the usage of HTLC's more practical and convenient. 
+A bribing game with parameters $f$ and $b$ may be safe for a significantly smaller $T$ than what is given in Theorem~\ref{equ:minT}. In its proof, we eliminated only strictly dominated strategies of weak miners. In principle, we can continue the process by eliminating strictly dominated strategies of strong miners as well. To do so, we can first sort the strong miners according to their selection probabilities. Starting with the strong miner with the smallest selection probability, and an upper bound of $T$ from Theorem~\ref{equ:minT}, we can calculate the minimum number of initial stages in which the miner is strictly better off playing \refuse{}. We then eliminate the strictly dominated strategies of that miner, and move to the next strong miner. At the end of this iterated elimination process, if all miners play \refuse{} in the first stage, then the game is proven to be safe. As we iterate from time period 0 to time period $T$, the value of $t$ where all miners play refuse for the \textit{last} time shows us that if we had begun the game at this point, the game would have been safe in the first stage itself. This new starting point of the game results in the new ending point being at $T_{new} = T_{old} - t$. In this new setting, the game is safe in the first stage. 
 
-\section{Solutions}
-\label{section:solutions}
-In the introduction, we pointed out that the two main applications of HTLC's: Lightning Channels and Atomic Swaps, are both vulnerable to this bribing attack. In this section, we first analyze the Bitcoin blockchain to get an estimate of the hashpower share of known mining pools. This lets us find parameters that can harden the HTLC constructions in each of these applications such that they are not vulnerable to the bribing attack. In the case of Atomic Swaps, to use these parameters, we propose a modification to the classic atomic swap protocol.
-
-\subsection{Mining Pools and their Hashpower Shares}\label{section:mining_pools}
-
-We try to find the weakest known miners in the Bitcoin ecosystem by analyzing the miners of the 16000 blocks from Block \#625000. We know the coinbase transaction indicators of larger mining pools. Using these, we can attribute mined blocks to known mining pools. Looking at these blocks, we can estimate each of these mining pools' share of the total hashpower based on how many blocks they have mined. Mining pools and their hashpower shares are shown in Table~\ref{table:mining_powers}. We see that the weakest known pools are under 1\% of the total hashpower, and this leads to our proposed fixes for both Lightning Channels and Atomic Swaps. 
-
-\begin{table}[ht]
-\caption{Hashpower of 16000 blocks from block \#625000} 
-\centering
-\begin{tabular}{|l|l|l|l|}
-\hline
-        Mining Pool & Hashpower & Mining Pool & Hashpower \\
-\hline
- F2Pool     & 15.7937\% & BTCTOP      & 2.6313\% \\
- PoolIn     & 15.5563\% & NovaBlock   & 0.9500\% \\
- BTC.com    & 12.2688\% & SpiderPool  & 0.6125\% \\
- AntPool    & 12.1625\% & Bitcoin.com & 0.1938\% \\
- Huobi      & 6.5875\%  & UkrPool     & 0.0938\% \\
- 58COIN     & 6.3000\%  & SigmaPool   & 0.0750\% \\
- ViaBTC     & 5.7875\%  & OkKong      & 0.0688\% \\
- OKEX       & 5.6437\%  & NCKPool     & 0.0625\% \\
- Unknown    & 4.0687\%  & MiningCity  & 0.0500\% \\
- SlushPool  & 3.8188\%  & KanoPool    & 0.0250\% \\
- Lubian.com & 3.6938\%  & MiningDutch & 0.0187\% \\
- Binance    & 3.5375\%  &             &         \\
-\hline
-\end{tabular}
-\label{table:mining_powers}
-\end{table}
-
-\subsection{Lightning}
-In the Lightning Network specifications (specifically, from Bolt 2 \cite{bolt_2}), we have the following parameters:
-\begin{itemize}
-    \item \emph{channel\_reserve\_satoshis}: Each side of a channel maintains this reserve so it always has something to lose if it were to try to broadcast an old, revoked commitment transaction. Currently, this is recommended to be 1\% of the total value of the channel. This is the amount that the cheated party can utilize as extra fees without dipping into their own side of the channel. 
-    \item \emph{to\_self\_delay}: This is the number of blocks that the counterparty's self outputs must be delayed in case a channel closes unilaterally from the counterparty's side. In one popular Lightning client: c-lightning \cite{c_lightning}, this is set by default to 144 blocks (approximately 1 day). In another popular Lightning client: LND \cite{lnd}, it is scaled in a range from 1 day to 14 days based on the channel value. 
-\end{itemize}
-We do not find any documented reasons on why these important parameters are set the way they are. Based on the analysis from Sections~\ref{ss:one_miner_weak} and~\ref{ss:iterated_elimination_of_dominated_strategies}, and the distribution of hashpowers, we can formulate what these values ought to be. 
-First, we note that \emph{channel\_reserve\_satoshis} on the victim's side of this bribing attack can be used by the victim to increase their fees to thwart the attack. We posit that \emph{channel\_reserve\_satoshis} being at 1\% is reasonable, given that there are many known miners whose hashpower is less than 1\% of the total hashpower of all miners. If it were lower than, say, 0.03\%, as per Section \ref{ss:all_miners_strong}, the channel would be always vulnerable to this bribing attack.     
-
-We then set $\frac{f}{b}$ to be 0.01, and calculate the total \emph{weak} hashpower to be 0.0215 (from Table~\ref{table:mining_powers}). Based on Theorem \ref{thm:largeT}, we get $T > 212$ blocks. This is larger than the suggested default of \emph{to\_self\_delay} at 144 blocks. So, if the channel operator is paranoid, they can set \emph{to\_self\_delay} to this higher value of 212. We can plug in the hashpowers from Table \ref{table:mining_powers} into Algorithm \ref{algorithm_1}, with $f = 1$ and $b = 100$ and we get a value of $T = 54$ blocks. If the channel operator is \emph{\#reckless} and believes that miners eliminate strictly dominated strategies of other miners (a stronger assumption than just assuming that weak miners exist), they can open channels with this much lower timelock value. Note that these values do not actually impact the usage of the Lightning Network, but are merely security parameters that ensure that both parties are adequately protected in case the other party decides to bribe miners. 
-
-\subsection{Atomic Swaps}
-Atomic Swaps that have Bitcoin on one side need to take Bitcoin's block time of 10 minutes into account. Even if the other blockchain in question (say Litecoin) has faster block generation, till Bitcoin's transactions are not confirmed, the atomic swap in question cannot be considered executed. Commercial platforms like Komodo \cite{komodo} use 15,600 seconds (26 blocks) as the HTLC's timelock value when they setup swaps between Bitcoin-like currencies or ERC-20 style tokens. Other works \cite{atomic_swaps_american_call_options}, \cite{atomic_swaps_bitmex}, \cite{htlcs_considered_harmful} have suggested that a timelock period of 1 day (144 blocks) is a good default. 
-
-Based on Theorem \ref{thm:largeT}, we get $\frac{f}{b} = 0.68$ at $T = 26$ blocks and $\frac{f}{b} = 0.122$ at $T = 144$ blocks. A fee to bribe ratio of 0.68 (for $T = 26$ blocks) is quite high. This suggests that $T = 26$ blocks does not provide enough security for reasonable values of fee to bribe ratios. At 144 blocks, we have a reasonable fee to bribe ratio of 0.122. 
-
-Unlike Lightning channel's \emph{channel\_reserve\_satoshis}, due to its inherently asymmetric nature, there is no simple way to encode this extra fee in the atomic swap itself. Alice has to convince Bob upfront that she will not attempt the bribing attack when it is Bob's turn to redeem his side of the swap. One way of achieving this is for Bob to offer a lower value than what Alice wants. This way, if Alice attempts the bribery attack, Bob can increase his \sellertxn{} fees to the amount dictated by Theorem \ref{thm:largeT} or Algorithm \ref{algorithm_1}. But if Alice does not attempt to bribe, this atomic swap setup is unfair to her as she is getting a lower value from Bob than what she is offering to Bob.
-
-To solve this, we present an extension to the classic Atomic Swap protocol that allows a way for Alice to include extra fees in the swap for Bob to use to ``counter-bribe'' \textit{only} if Alice attempts to bribe.
-\noindent
-
-
-\textbf{Risk Free Atomic Swap}: Here, as with the classic protocol, Alice creates a (random) secret preimage and hashes it to get her ``locking string''. Alice creates a transaction that commits her swap amount such that Bob can claim this amount only if he knows the preimage. The ``refund'' part of this transaction, instead of sending the amount back to Alice after a timelock, sends it to a multisig controlled by both Alice and Bob. Alice also creates a second transaction that uses this multisig controlled output as its first input, and another unrelated input from Alice which adds the extra fees required to make the swap risk-free. The total output of this second transaction is sent to Bob \textit{only} if he has the secret preimage, or to Alice after a timelock. This pair of transactions is created by Alice; the second transaction is pre-signed by Bob and needs to be held by Alice before she broadcasts the first transaction. These transactions, and the accompanying flowchart are listed in detail in Appendix \ref{appendex:atomic_swap}. Based on whether Alice or Bob abort the swap, or Alice bribes miners, or Alice and Bob complete a normal swap, a combination of these transactions will be broadcast on the both blockchains by Alice and/or Bob as depicted by the flow chart.
-
-\section{Related Work}
-There are two major strands of censorship attacks in blockchains. Ignore attacks (that incentivize miners to ignore certain transactions) and fork attacks (that incentivize miners to orphan blocks with certain transactions by forking the blockchain).
-
-\subsection{Ignore Attacks}
-Ignore Attacks are presented in \cite{temporary_censorship_attack_ethereum}, \cite{pay_to_win}, and \cite{mad_htlc}. In \cite{temporary_censorship_attack_ethereum}, smart contracts in a ``funding blockchain'' are used to censor transactions in a ``target blockchain''. Funding blockchains need to support powerful smart contract primitives to be able to program these attacks -- typically Ethereum is used. Two such attack smart contracts presented in \cite{temporary_censorship_attack_ethereum} are Pay-per-Miner and Pay-per-Block. In Pay-per-Miner, every miner gets a bribe at the end of the bribing period if the bribing attack succeeds, even if the miner followed the bribe or not. A weak miner could refuse the bribe, and attempt to mine with the \sellertxn{}, but not succeed in mining a block. This miner would still be eligible for the bribe at the end. This contract does not consider a weak miner's lower probability of mining the final block with the bribe and hence, overpays. In Pay-Per-Block, every miner is paid incrementally per block during the bribing period. This attack also bribes weak miners who go against the bribe, and thus have a higher expected reward at the end of the bribing period. Both these attacks would get better if miners could cryptographically prove to the smart contract that they are following the bribe.
-
-Concurrent to our work, a similar timelocked bribing attack is presented in \cite{mad_htlc}. They consider the situation where all miners are strong (i.e., $p_j\geq \frac{f}{b}$ for all miners $1\leq j\leq n$), and like us, they conclude that the bribing attack will be successful and is independent of the bribing period $T$. To alleviate this situation where all miners are strong and bribing attacks could happen, they propose a modified construction of the HTLC called MAD-HTLC (Mutually Assured Destruction HTLC). MAD-HTLC adds a second transaction chained to the HTLC with a collateral from the bribing counterparty to ensure that they have something to lose if they attempt to bribe. However, \cite{mad_htlc} does not consider weak miners, or elimination of dominated strategies - which we show lead to HTLC parameters that can be adjusted to safeguard against this bribing attack with any distribution of miner hashpowers and values of $f$ and $b$. Our approach also doesn't need a modification to the HTLC construction and the associated collateral and extra transaction costs.
-
-Transaction Pinning \cite{transaction_pinning} tries to make a transaction inherently unprofitable to mine, independent of any future bribe. The attacker, who can validly spend one of the target transaction's outputs broadcasts multiple low fee-rate transactions that spends their path of the target transaction. This makes the entire transaction package unprofitable to mine, thereby censoring the first transaction, which the victim can spend through another path. To remedy this, the victim can use CPFP carve-outs \cite{cpfp_carveout} to bump up the fee-rate of the censored transaction and still get it confirmed by a miner. To enable this, Lightning Channels will allow ``anchor outputs'' \cite{anchor_outputs} to let either party bump up their fees without being blocked by the counterparty.
-
-These types of Ignore Attacks rely on being able to setup and communicate incentives (in the present, or in the future) to miners such that the most profitable strategy for each miner is to wait for the incentive. Whether these incentives succeed or not, depends on the current value available to miners, the future value promised to miners, and the ability of miners to be able to extract these values. Unlike previous research, our work takes into account \textit{all} these parameters.
-
-\subsection{Fork Attacks}
-Fork Attacks go back a long way, with the earliest one discussed on bitcointalk.org being \emph{feather forking} \cite{feather_forking}. In this attack, a miner wants to censor a specific transaction and announces on some public bulletin board that they will not add blocks on top of any block that contains this specific transaction. If this miner has a reasonable chance of getting a block, other rational miners will follow them instead of mining ``normally'' and hence forgo the fees of the censored transaction. Feather forking is also analyzed under the Pay-per-Commit contract in \cite{temporary_censorship_attack_ethereum}. Feather forking relies on a miner committing to the attack, and this being common knowledge among all miners. This attack relies on both a funding cryptocurrency blockchain to set up the attack and a way to communicate with all miners that the attack is going to happen.  
-
-Miners can be also incentivized to fork the Bitcoin blockchain with ``Whale Transactions'' \cite{whale_transactions}. Here, the attacker waits for a target transaction to be confirmed to a sufficient depth to get the corresponding goods and services from their victim. After that, the attacker tries to fork the blockchain by successively broadcasting transactions that have high fees (whale transactions) and also reverse the target transaction. These whale transactions are then included in blocks of the blockchain fork that rational miners might follow. The authors evaluate the relationship between confirmation depth, the attacker's secret mining lead, the attacker's hashpower, the whale transaction fees and whether these attacks are profitable. External smart contracts on platforms like Ethereum can be used \cite{smart_contracts_for_bribing}, \cite{pay_to_win} to incentivize Bitcoin miners to abandon the honest blockchain suffix and mine on top of a briber's fork. In \cite{pay_to_win}, the attacker chooses the set of transactions to be mined for each block, and hands it out to miners through the smart contract. This is similar to how mining pools operate. Miners get rewarded in the ``funding cryptocurrency'' (Ether, in this case). Incentivizing every Bitcoin miner with Ether given the relative size of the two systems seems far fetched to us.
-
-Fork Attacks rely on attackers being able to incentivize rational miners to orphan a reasonable length suffix of the blockchain. The attack succeeds if it is conducted after the primary transaction has been thought confirmed by the victim. Given that most proof-of-work cryptocurrencies have a probabilistic notion of finality, these attacks are feasible. On the other hand, Bitcoin has seen fewer and fewer orphan blocks over time \cite{orphans}, and the possibility of this kind of attack is considerably lower now than they were in, say, 2015. 
-
-\section{Conclusion}
-In this work, we observe that HTLC's are vulnerable to an ``in-band'' bribing attack where the HTLC initiator (buyer, in our case) can receive goods and services offline and then prevent the seller from getting their due share by bribing miners. This bribe can only work if the ``time value'' of waiting for the bribe is worthwhile for all miners. A rather self-evident observation is that when the timelock on the bribe expires and the bribe transaction is still valid, it will be claimed in the immediate next block as the fee on it is considerably higher than normal transaction fees. Additionally, stronger miners are likely to mine any specific block - and therefore more likely to mine the block in which the bribe is valid and available. Therefore, we posit that weaker miners will ignore the bribe altogether and will attempt to mine the seller's transaction while the timelock holds and the fee on the seller's transaction is good enough. This leads us to the relationship between the fee to bribe ratio and the distribution of miners' hashpowers. Based on this analysis, we propose Lightning Channel parameters that make them resistant to this kind of bribing attack. In Atomic Swaps, our analysis also proposes a fee for the victim to safeguard themselves. To enable that, we propose a modification to the classic Atomic Swap protocol that can bring in this fee into the swap and still keep it fair for both parties.
-
-\renewcommand{\thesection}{\Alph{section}}%
-\section{Transactions in pseudo Bitcoin Script}
-\label{appendex:transactions}
-HTLC Transaction:
-\begin{lstlisting}
-HTLC_TXN: { 
-  txid: HTLC_TXN_TXID
-  vin: [{ 
-    txid: SOURCE_TXN_ID that pays the buyer.
-    scriptSig: <buyer's sig for SOURCE_TXN_ID> 
-  }]      
-  vout: [{ 
-    value: <value>
-    scriptPubKey: IF
-                    OP_HASH160 <digest> OP_EQUALVERIFY 
-                    <seller_pubkey_1>
-                  OP_ELSE
-                    <delay> OP_CSV OP_DROP <buyer_pubkey_1>
-                  OP_ENDIF
-                  OP_CHECKSIG 
-  }]
-}
-\end{lstlisting}
-Seller Transaction, spending from the hashlocked path:
-\begin{lstlisting}
-SELLER_TXN: { 
-  txid: SELLER_TXN_TXID
-  vin: [{ 
-    txid: HTLC_TXN_TXID
-    scriptSig: <seller_sig_1> <preimage> OP_TRUE 
-  }]      
-  vout: [{ 
-    value: <value>
-    scriptPubKey: <seller_pubkey_2 > OP_CHECKSIG 
-  }]
-}
-\end{lstlisting}
-Refund Transaction, spending from the timelocked path:
-\refundtxn{}:
-\begin{lstlisting}
-REFUND_TXN: { 
-  txid: REFUND_TXN_TXID
-  vin: [{ 
-    txid: HTLC_TXN_TXID
-    scriptSig: <buyer_sig_1> OP_FALSE
-    sequence: <delay> }]      
-  vout: [{ 
-    scriptPubKey: <buyer_pubkey_2 > OP_CHECKSIG
-  }]
-}
-\end{lstlisting}
-Bribe Transaction, which leaves the output values to miners:
-\bribetxn{}:
-\begin{lstlisting}
-BRIBE_TXN: { 
-  txid: BRIBE_TXN_TXID
-  vin: [{ 
-    txid: REFUND_TXN_TXID
-    scriptSig: <buyer_sig_2>
-  vout: [{ 
-    // Empty output. Entire amount goes to the miner 
-  }]
-}
-\end{lstlisting}
-
-
-\section{Iterated Removal of Dominated Strategies}
 The \texttt{FIND\_T} procedure receives as input a list of mining hashpowers (leader selection probabilities), and the values of parameters $f$ and $b$. As output, it returns the lowest value of $T$ such that all miners refuse the bribe in the first stage of the game. It uses the inner procedure \texttt{CALCULATE\_BRIBERY\_MATRIX} to determine the behavior of more strong miners at each block when less strong miners' strategies get dominated.
 
-\begin{figure}
+\begin{figure}[H]
+\centering
 \caption{Iterated Removal of Dominated Strategies}\label{algorithm_1}
-\label{appendex:algorithm}
+\label{bribing:algorithm}
 \begin{algorithmic}[1]
 \Procedure{CALCULATE\_BRIBERY\_MATRIX}{$\mathbb{P}, f, b, T$}
     \State $\mathbb{B} \gets [][]$ \Comment{  Bribery Matrix where B[j][i] represents whether $miner_j$ follows the bribe at $block_i$}
@@ -407,117 +272,82 @@ Let's take the case of 4 miners with hashpower shares $\mathbb{P} = [0.1, 0.2, 0
 
 The miner with hashpower 0.1 ($p_0$) will play \refuse{} at every block because we have $T > \frac{\log \frac{f}{b}}{\log (1-p_w)}$. The miner with hashpower 0.2 ($p_1$) will play \refuse{} as long as the expected bribe (payable at $T+1$) calculated at a particular block is lower than the fees that they would earn if they mine that block. In this case, $(1- p_w)^t \cdot p_1 \cdot b < f$ till $t = 6$ for values of $f = 11, b = 100, p_w = 0.1$. This means that $p_1$ will start playing \follow{} as we get closer to $t = T$ (specifically when we are 5 blocks away from $T$). The miner with hashpower 0.3 ($p_3$) will play \refuse{} along similar lines, by looking at the actions of miners $p_0$ and $p_1$ over the different blocks. One thing to notice is that at block \#16, $p_2$ will act assuming that $p_0$ and $p_1$ will both play \refuse{}. At block \#17, $p_2$ will act assuming that $p_0$ will play \refuse{} and $p_1$ will play \follow{}. This is implemented in the algorithm by using the 0's and 1's in the bribery matrix and using them as factors in line \#13 of the \texttt{CALCULATE\_BRIBERY\_MATRIX} procedure. This way, on line \#13, we only use miners who play \refuse{} at each block to calculate the expected bribe.
 
-In the main procedure \texttt{FIND\_T}, we then find the last block in which all miners play \refuse{} and return that as the result. In the real world, we can give a 5-6 block cushion on top of this, and it will still be significantly lower than the upper bound of $T$.
-\section{Risk Free Atomic Swaps}
-\label{appendex:atomic_swap}
-The classic atomic swap of 4 transactions is changed to the Risk Free Atomic Swap with 6 transactions: {\texttt{ALICE\_TX1}} (sets up the swap), {\texttt{ALICE\_TX2}} (brings in the extra fee to enable risk-free-ness), {\texttt{ALICE\_REFUND\_TX}}, {\texttt{ALICE\_BRIBE\_TX}}, {\texttt{BOB\_SWAP\_TX}}, {\texttt{BOB\_COUNTER\_BRIBE\_TX}} (uses fee from Alice, instead of losing his own funds).
-\begin{lstlisting}
-ALICE_TX1: {
-  txid: ALICE_TX1_TXID,
-  vin: [{
-    txid: PREV_TX1_TXID // Pays amount X to Alice
-    scriptSig: <Alice's sig>
-  }]      
-  vout: [{
-    value: X
-    scriptPubKey: 
-      IF
-        OP_HASH160 <digest> OP_EQUALVERIFY
-        <bob_pubkey_first_exit> OP_CHECKSIG
-      OP_ELSE
-        2 <alice_pubkey_1> <bob_pubkey_1> 2 
-        OP_CHECKMULTISIG
-      OP_ENDIF
-  }]
-}
-\end{lstlisting}
+$T_{new}$ is lower than $T$, and now, with just one weak miner, and elimination of dominated strategies of all miners, the game is safe for lower values of $T$. This lower value of $T$ makes the usage of HTLC's more practical and convenient. In the real world, we can give a 5-6 block cushion on top of this, and it will still be significantly lower than the upper bound of $T$.
 
-\begin{lstlisting}
-ALICE_TX2: {
-  txid: ALICE_TX2_TXID,
-  vin: [{
-    txid: ALICE_TX1_TXID
-    scriptSig: 0 <alice_sig_1> <bob_sig_1> OP_FALSE
-  }, {
-    txid: PREV_TX2_TXID // Pays F to Alice
-    scriptSig: <Alice's sig>
-  }]
-  vout: [{
-    value: X + F
-    scriptPubKey: 
-      IF
-        OP_HASH160 <digest> OP_EQUALVERIFY
-        <bob_pubkey_second_exit>
-      OP_ELSE
-        `to_alice_delay`
-        OP_CSV
-        OP_DROP
-        <alice_pubkey_2>
-      OP_ENDIF
-      OP_CHECKSIG
-  }]
-}
-\end{lstlisting}
+\section{Solutions}
+\label{section:solutions}
+In the introduction, we pointed out that the two main applications of HTLC's: Lightning Channels and Atomic Swaps, are both vulnerable to this bribing attack. In this section, we first analyze the Bitcoin blockchain to get an estimate of the hashpower share of known mining pools. This lets us find parameters that can harden the HTLC constructions in each of these applications such that they are not vulnerable to the bribing attack. In the case of Atomic Swaps, to use these parameters, we propose a modification to the classic atomic swap protocol.
 
-\begin{lstlisting}
-ALICE_BRIBE_TX: {
-  txid: ALICE_BRIBE_TXID
-  vin: [{
-    txid: ALICE_TX2_TXID
-    scriptSig: <alice_sig_2> OP_FALSE
-    sequence: `to_alice_delay`
-  }]
-  vout: [{
-    value: 0 // Leaves X + F as bribe to miners.
-  }]
-}
-\end{lstlisting}
+\subsection{Mining Pools and their Hashpower Shares}\label{section:mining_pools}
 
-\begin{lstlisting}
-ALICE_REFUND_TX: {
-  txid: ALICE_REFUND_TXID
-  vin: [{
-    txid: ALICE_TX2_TXID
-    scriptSig: <alice_sig_2> OP_FALSE
-    sequence: `to_alice_delay`
-  }]
-  vout: [{
-    value: X + F // Refund to Alice
-    scriptPubKey: <alice_pubkey_refund > OP_CHECKSIG
-  }]
-}
-\end{lstlisting}
+We try to find the weakest known miners in the Bitcoin ecosystem by analyzing the miners of the 16000 blocks from Block \#625000. We know the coinbase transaction indicators of larger mining pools. Using these, we can attribute mined blocks to known mining pools. Looking at these blocks, we can estimate each of these mining pools' share of the total hashpower based on how many blocks they have mined. Mining pools and their hashpower shares are shown in Table~\ref{table:mining_powers}. We see that the weakest known pools are under 1\% of the total hashpower, and this leads to our proposed fixes for both Lightning Channels and Atomic Swaps. 
 
-\begin{lstlisting}
-BOB_SWAP_TX: {
-  txid: BOB_SWAP_TXID
-  vin: [{
-    txid: ALICE_TX1_TXID
-    scriptSig: <bob_sig_first_exit> <preimage> OP_TRUE
-  }]
-  vout: [{
-    value: X // No extra fees for Bob
-    scriptPubKey: <bob_pubkey_swap> OP_CHECKSIG
-  }]
-}
-\end{lstlisting}
+\begin{table}[ht]
+\caption{Hashpower of 16000 blocks from block \#625000} 
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+        Mining Pool & Hashpower & Mining Pool & Hashpower \\
+\hline
+ F2Pool     & 15.7937\% & BTCTOP      & 2.6313\% \\
+ PoolIn     & 15.5563\% & NovaBlock   & 0.9500\% \\
+ BTC.com    & 12.2688\% & SpiderPool  & 0.6125\% \\
+ AntPool    & 12.1625\% & Bitcoin.com & 0.1938\% \\
+ Huobi      & 6.5875\%  & UkrPool     & 0.0938\% \\
+ 58COIN     & 6.3000\%  & SigmaPool   & 0.0750\% \\
+ ViaBTC     & 5.7875\%  & OkKong      & 0.0688\% \\
+ OKEX       & 5.6437\%  & NCKPool     & 0.0625\% \\
+ Unknown    & 4.0687\%  & MiningCity  & 0.0500\% \\
+ SlushPool  & 3.8188\%  & KanoPool    & 0.0250\% \\
+ Lubian.com & 3.6938\%  & MiningDutch & 0.0187\% \\
+ Binance    & 3.5375\%  &             &         \\
+\hline
+\end{tabular}
+\label{table:mining_powers}
+\end{table}
 
-\begin{lstlisting}
-BOB_COUNTER_BRIBE_TX: {
-  txid: BOB_COUNTER_BRIBE_TXID
-  vin: [{
-    txid: ALICE_TX2_TXID
-    scriptSig: <bob_sig_second_exit> <preimage> OP_TRUE
-  }]
-  vout: [{
-    value: X // Leaves F to the miners
-    scriptPubKey: <bob_pubkey_swap> OP_CHECKSIG
-  }]
-}
-\end{lstlisting}
+\subsection{Lightning}
+In the Lightning Network specifications (specifically, from Bolt 2 \cite{bolt_2}), we have the following parameters:
+\begin{itemize}
+    \item \emph{channel\_reserve\_satoshis}: Each side of a channel maintains this reserve so it always has something to lose if it were to try to broadcast an old, revoked commitment transaction. Currently, this is recommended to be 1\% of the total value of the channel. This is the amount that the cheated party can utilize as extra fees without dipping into their own side of the channel. 
+    \item \emph{to\_self\_delay}: This is the number of blocks that the counterparty's self outputs must be delayed in case a channel closes unilaterally from the counterparty's side. In one popular Lightning client: c-lightning \cite{c_lightning}, this is set by default to 144 blocks (approximately 1 day). In another popular Lightning client: LND \cite{lnd}, it is scaled in a range from 1 day to 14 days based on the channel value. 
+\end{itemize}
+We do not find any documented reasons on why these important parameters are set the way they are. Based on the analysis from Sections~\ref{ss:one_miner_weak} and~\ref{ss:iterated_elimination_of_dominated_strategies}, and the distribution of hashpowers, we can formulate what these values ought to be. 
+First, we note that \emph{channel\_reserve\_satoshis} on the victim's side of this bribing attack can be used by the victim to increase their fees to thwart the attack. We posit that \emph{channel\_reserve\_satoshis} being at 1\% is reasonable, given that there are many known miners whose hashpower is less than 1\% of the total hashpower of all miners. If it were lower than, say, 0.03\%, as per Section \ref{ss:all_miners_strong}, the channel would be always vulnerable to this bribing attack.     
 
-Note that the second blockchain transactions are unchanged from the classic Atomic Swap protocol. This is because, unlike Lightning channels, in an Atomic Swap, only the swap initiator (in this case, Alice) can attempt to cheat by bribing the first blockchain's miners after she claims her side of the swap on the second blockchain. So, the modification to the classic swap that brings in the ``counter bribe fees" is done only on Alice's side of the swap as shown above with the intermediate multisig.
+We then set $\frac{f}{b}$ to be 0.01, and calculate the total \emph{weak} hashpower to be 0.0215 (from Table~\ref{table:mining_powers}). Based on Theorem \ref{thm:largeT}, we get $T > 212$ blocks. This is larger than the suggested default of \emph{to\_self\_delay} at 144 blocks. So, if the channel operator is paranoid, they can set \emph{to\_self\_delay} to this higher value of 212. We can plug in the hashpowers from Table \ref{table:mining_powers} into Algorithm \ref{algorithm_1}, with $f = 1$ and $b = 100$ and we get a value of $T = 54$ blocks. If the channel operator is \emph{\#reckless} and believes that miners eliminate strictly dominated strategies of other miners (a stronger assumption than just assuming that weak miners exist), they can open channels with this much lower timelock value. Note that these values do not actually impact the usage of the Lightning Network, but are merely security parameters that ensure that both parties are adequately protected in case the other party decides to bribe miners. 
 
+\subsection{Atomic Swaps}
+Atomic Swaps (as described in \ref{chap:background}) that have Bitcoin on one side need to take Bitcoin's block time of 10 minutes into account. Even if the other blockchain in question (say Litecoin) has faster block generation, till Bitcoin's transactions are not confirmed, the atomic swap in question cannot be considered executed. Commercial platforms like Komodo \cite{komodo} use 15,600 seconds (26 blocks) as the HTLC's timelock value when they setup swaps between Bitcoin-like currencies or ERC-20 style tokens. Other works \cite{atomic_swaps_american_call_options}, \cite{atomic_swaps_bitmex}, \cite{htlcs_considered_harmful} have suggested that a timelock period of 1 day (144 blocks) is a good default. 
+
+Based on Theorem \ref{thm:largeT}, we get $\frac{f}{b} = 0.68$ at $T = 26$ blocks and $\frac{f}{b} = 0.122$ at $T = 144$ blocks. A fee to bribe ratio of 0.68 (for $T = 26$ blocks) is quite high. This suggests that $T = 26$ blocks does not provide enough security for reasonable values of fee to bribe ratios. At 144 blocks, we have a reasonable fee to bribe ratio of 0.122. 
+
+Unlike Lightning channel's \emph{channel\_reserve\_satoshis}, due to its inherently asymmetric nature, there is no simple way to encode this extra fee in the atomic swap itself. Alice has to convince Bob upfront that she will not attempt the bribing attack when it is Bob's turn to redeem his side of the swap. One way of achieving this is for Bob to offer a lower value than what Alice wants. This way, if Alice attempts the bribery attack, Bob can increase his \sellertxn{} fees to the amount dictated by Theorem \ref{thm:largeT} or Algorithm \ref{algorithm_1}. But if Alice does not attempt to bribe, this atomic swap setup is unfair to her as she is getting a lower value from Bob than what she is offering to Bob.
+
+To solve this, we present an extension to the classic Tier Nolan Atomic Swap protocol that allows a way for Alice to include extra fees in the swap for Bob to use to ``counter-bribe'' \textit{only} if Alice attempts to bribe.
+
+\subsection{Risk Free Atomic Swaps}
+\label{bribing:risk_free_atomic_swap}
+Here, as with the classic Tier Nolan swap, Alice creates a (random) secret preimage and hashes it to get her ``locking string''. Alice creates a transaction ({\texttt{ALICE\_TX1}}) that commits her swap amount such that Bob can claim this amount only if he knows the preimage. The ``refund'' part of this transaction, instead of sending the amount back to Alice after a timelock, sends it to a multisig controlled by both Alice and Bob. Alice also creates a second transaction ({\texttt{ALICE\_TX1}}) that uses this multisig controlled output as its first input, and another unrelated input from Alice which adds the extra fees required to make the swap risk-free. The total output of this second transaction is sent to Bob \textit{only} if he has the secret preimage, or to Alice after a timelock. This pair of transactions is created by Alice; the second transaction is pre-signed by Bob and needs to be held by Alice before she broadcasts the first transaction. 
+
+\begin{figure}[hbt!]
+    \centering
+    \caption{Risk Free Atomic Swaps}
+    \label{fig:risk_free_atomic_swap}
+\begin{align*}
+    \texttt{ALICE\_TX1} &= [(P|\sigma_a)] \mapsto [(P|(\sigma_a \land \sigma_b) \lor (\sigma_b \land H_{s}))] \\
+    \texttt{ALICE\_TX2} &= [(f|\sigma_a), \underbrace{(P|(\sigma_a \land \sigma_b))}_{\texttt{ALICE\_TX1}}] \mapsto \\ 
+    &\phantomrel{=} {} [((f+P)| ((\sigma_b \land H_{s}) \lor (\sigma_a \land \Delta))]\\ 
+    \texttt{ALICE\_BRIBE\_TX} &= [\underbrace{(f+P)|(\sigma_a \land \Delta)}_{\texttt{ALICE\_TX2}})] \mapsto [(f+P)| \emptyset]\\  
+    \texttt{ALICE\_REFUND\_TX} &= [\underbrace{(f+P)|(\sigma_a \land \Delta)}_{\texttt{ALICE\_TX2}})] \mapsto [(f+P)| \sigma_a]\\  
+    \texttt{BOB\_SWAP\_TX} &= [\underbrace{P|(\sigma_b \land s)}_{\texttt{ALICE\_TX1}})] \mapsto [P| \sigma_b]\\
+    \texttt{BOB\_COUNTER\_BRIBE\_TX} &= [\underbrace{(f+P)|(\sigma_b \land s)}_{\texttt{ALICE\_TX2}})] \mapsto [P| \sigma_b]\\
+\end{align*}
+\end{figure}
+
+Based on whether Alice or Bob abort the swap, or Alice bribes miners, or Alice and Bob complete a normal swap, a combination of these transactions will be broadcast on the both blockchains by Alice and/or Bob as depicted by the flow chart.
+
+Note that the second blockchain transactions are unchanged from the classic Atomic Swap protocol. This is because, unlike Lightning channels, in an Atomic Swap, only the swap initiator (in this case, Alice) can attempt to cheat by bribing the first blockchain's miners after she claims her side of the swap on the second blockchain. So, the modification to the classic swap that brings in the ``counter bribe fees'' is done only on Alice's side of the swap as shown above with the intermediate multisig.
 
 % Define block styles
 \tikzstyle{decision} = [diamond, draw, 
@@ -566,3 +396,26 @@ Note that the second blockchain transactions are unchanged from the classic Atom
 \end{tikzpicture}
 \label{fig:atomic_swap}    
 \end{figure}
+
+
+\section{Related Work}
+There are two major strands of censorship attacks in blockchains. Ignore attacks (that incentivize miners to ignore certain transactions) and fork attacks (that incentivize miners to orphan blocks with certain transactions by forking the blockchain).
+
+\subsection{Ignore Attacks}
+Ignore Attacks are presented in \cite{temporary_censorship_attack_ethereum}, \cite{pay_to_win}, and \cite{mad_htlc}. In \cite{temporary_censorship_attack_ethereum}, smart contracts in a ``funding blockchain'' are used to censor transactions in a ``target blockchain''. Funding blockchains need to support powerful smart contract primitives to be able to program these attacks -- typically Ethereum is used. Two such attack smart contracts presented in \cite{temporary_censorship_attack_ethereum} are Pay-per-Miner and Pay-per-Block. In Pay-per-Miner, every miner gets a bribe at the end of the bribing period if the bribing attack succeeds, even if the miner followed the bribe or not. A weak miner could refuse the bribe, and attempt to mine with the \sellertxn{}, but not succeed in mining a block. This miner would still be eligible for the bribe at the end. This contract does not consider a weak miner's lower probability of mining the final block with the bribe and hence, overpays. In Pay-Per-Block, every miner is paid incrementally per block during the bribing period. This attack also bribes weak miners who go against the bribe, and thus have a higher expected reward at the end of the bribing period. Both these attacks would get better if miners could cryptographically prove to the smart contract that they are following the bribe.
+
+Concurrent to our work, a similar timelocked bribing attack is presented in \cite{mad_htlc}. They consider the situation where all miners are strong (i.e., $p_j\geq \frac{f}{b}$ for all miners $1\leq j\leq n$), and like us, they conclude that the bribing attack will be successful and is independent of the bribing period $T$. To alleviate this situation where all miners are strong and bribing attacks could happen, they propose a modified construction of the HTLC called MAD-HTLC (Mutually Assured Destruction HTLC). MAD-HTLC adds a second transaction chained to the HTLC with a collateral from the bribing counterparty to ensure that they have something to lose if they attempt to bribe. However, \cite{mad_htlc} does not consider weak miners, or elimination of dominated strategies - which we show lead to HTLC parameters that can be adjusted to safeguard against this bribing attack with any distribution of miner hashpowers and values of $f$ and $b$. Our approach also doesn't need a modification to the HTLC construction and the associated collateral and extra transaction costs.
+
+Transaction Pinning \cite{transaction_pinning} tries to make a transaction inherently unprofitable to mine, independent of any future bribe. The attacker, who can validly spend one of the target transaction's outputs broadcasts multiple low fee-rate transactions that spends their path of the target transaction. This makes the entire transaction package unprofitable to mine, thereby censoring the first transaction, which the victim can spend through another path. To remedy this, the victim can use CPFP carve-outs \cite{cpfp_carveout} to bump up the fee-rate of the censored transaction and still get it confirmed by a miner. To enable this, Lightning Channels will allow ``anchor outputs'' \cite{anchor_outputs} to let either party bump up their fees without being blocked by the counterparty.
+
+These types of Ignore Attacks rely on being able to setup and communicate incentives (in the present, or in the future) to miners such that the most profitable strategy for each miner is to wait for the incentive. Whether these incentives succeed or not, depends on the current value available to miners, the future value promised to miners, and the ability of miners to be able to extract these values. Unlike previous research, our work takes into account \textit{all} these parameters.
+
+\subsection{Fork Attacks}
+Fork Attacks go back a long way, with the earliest one discussed on bitcointalk.org being \emph{feather forking} \cite{feather_forking}. In this attack, a miner wants to censor a specific transaction and announces on some public bulletin board that they will not add blocks on top of any block that contains this specific transaction. If this miner has a reasonable chance of getting a block, other rational miners will follow them instead of mining ``normally'' and hence forgo the fees of the censored transaction. Feather forking is also analyzed under the Pay-per-Commit contract in \cite{temporary_censorship_attack_ethereum}. Feather forking relies on a miner committing to the attack, and this being common knowledge among all miners. This attack relies on both a funding cryptocurrency blockchain to set up the attack and a way to communicate with all miners that the attack is going to happen.  
+
+Miners can be also incentivized to fork the Bitcoin blockchain with ``Whale Transactions'' \cite{whale_transactions}. Here, the attacker waits for a target transaction to be confirmed to a sufficient depth to get the corresponding goods and services from their victim. After that, the attacker tries to fork the blockchain by successively broadcasting transactions that have high fees (whale transactions) and also reverse the target transaction. These whale transactions are then included in blocks of the blockchain fork that rational miners might follow. The authors evaluate the relationship between confirmation depth, the attacker's secret mining lead, the attacker's hashpower, the whale transaction fees and whether these attacks are profitable. External smart contracts on platforms like Ethereum can be used \cite{smart_contracts_for_bribing}, \cite{pay_to_win} to incentivize Bitcoin miners to abandon the honest blockchain suffix and mine on top of a briber's fork. In \cite{pay_to_win}, the attacker chooses the set of transactions to be mined for each block, and hands it out to miners through the smart contract. This is similar to how mining pools operate. Miners get rewarded in the ``funding cryptocurrency'' (Ether, in this case). Incentivizing every Bitcoin miner with Ether given the relative size of the two systems seems far fetched to us.
+
+Fork Attacks rely on attackers being able to incentivize rational miners to orphan a reasonable length suffix of the blockchain. The attack succeeds if it is conducted after the primary transaction has been thought confirmed by the victim. Given that most proof-of-work cryptocurrencies have a probabilistic notion of finality, these attacks are feasible. On the other hand, Bitcoin has seen fewer and fewer orphan blocks over time \cite{orphans}, and the possibility of this kind of attack is considerably lower now than they were in, say, 2015. 
+
+\section{Conclusion}
+In this chapter, we observe that HTLC's are vulnerable to an ``in-band'' bribing attack where the HTLC initiator (buyer, in our case) can receive goods and services offline and then prevent the seller from getting their due share by bribing miners. This bribe can only work if the ``time value'' of waiting for the bribe is worthwhile for all miners. A rather self-evident observation is that when the timelock on the bribe expires and the bribe transaction is still valid, it will be claimed in the immediate next block as the fee on it is considerably higher than normal transaction fees. Additionally, stronger miners are likely to mine any specific block - and therefore more likely to mine the block in which the bribe is valid and available. Therefore, we posit that weaker miners will ignore the bribe altogether and will attempt to mine the seller's transaction while the timelock holds and the fee on the seller's transaction is good enough. This leads us to the relationship between the fee to bribe ratio and the distribution of miners' hashpowers. Based on this analysis, we propose Lightning Channel parameters that make them resistant to this kind of bribing attack. In Atomic Swaps, our analysis also proposes a fee for the victim to safeguard themselves. To enable that, we propose a modification to the classic Tier Nolan Atomic Swap protocol that can bring in this fee into the swap and still keep it fair for both parties.

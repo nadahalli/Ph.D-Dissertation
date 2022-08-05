@@ -2,11 +2,11 @@
 \label{chapter:swaps}
 
 \section{Introduction}
-Before Bitcoin, there was considerable research on the \textit{Fair Exchange Problem}, with its associated impossibility results \cite{cleve1986limits}, \cite{fair_exchange_impossibility}, \cite{franklin1997fair}, \cite{asokan1998optimistic}. Many of these results came about in the quest to remove the \textit{trusted third party} when two parties want to exchange different assets of equal value. Bitcoin created a different kind of trusted third party. Here, both parties trust the Bitcoin blockchain as an arbiter for dispute resolution and as a tamperproof public bulletin board. Fair Exchange, in the Bitcoin setting, is known as the Atomic Swap. It is atomic in the sense that a swap of assets between two parties either goes through fully or not at all. Atomic Swaps were perhaps the first non-trivial smart contracts designed to work on blockchains. Tier Nolan's classic swap (TN-swap, from here on) was discussed on the BitoinTalk forum in 2013 \cite{atomic_swap}. The TN-swap is not atomic from a transaction perspective. The swap requires 4 transactions: 2 HTLCs + (2 redeems or 2 refunds).\footnote{HTLC stands for Hash Timelock Contracts \cite{htlcs_considered_harmful}, and the redeem and refund transactions are part of the HTLC specification.} The atomicity is from a higher abstraction of the swap of assets -- either the swap goes through, and both parties end up with the assets they desire, or it does not, and both parties retain their original assets. These assets could even be on different blockchains, e.g., Bitcoin and Litecoin. If it were a cross-chain atomic swap, both blockchains must be compatible with the primitives used in the swap protocol. 
+Atomic swaps, which were introduced in Section \ref{chap:background:atomic_swaps}, are an important tool in Bitcoin's privacy arsenal. If two users swap their coins for no commercial reason, the swap obfuscates the trail that follows the flow of money through the blockchain - as proposed in CoinSwap \cite{coinswap}. Such privacy practices, if used by enough people, gives privacy to all people. 
 
-Atomic swaps could involve various assets: say, someone wants to buy a Sudoku solution for some price. However, these generally involve more complex protocols that convert assets into information that can be transferred on a public blockchain. In the case of a Sudoku, a symmetric key is used to encrypt the solution, and this key is atomically swapped for monetary value, while the encrypted blob is sent off-chain, as seen in ZKCP \cite{maxwell2016zero}. This kind of swap has one of the assets not being scrutinizable on the blockchain and hence has to rely on more complex Zero-Knowledge proofs to convince the buyer that the key encrypts a correct solution. We want to look at a more straightforward class of atomic swaps where one can scrutinize the actual asset being swapped on the blockchain, and the buyer or the swap initiator doesn't need any other data beyond the blockchain. In the base case, these swaps involve the native cryptocurrency of the blockchain(s). In the single blockchain setting, swapping coins of equal value between Alice and Bob can improve both their privacy, as proposed in Coinswap \cite{coinswap}.
+Atomic swaps can involve various assets: say, someone wants to buy a Sudoku solution for some price. However, these generally involve more complex protocols that convert assets into information that can be transferred on a public blockchain. In the case of a Sudoku, a symmetric key is used to encrypt the solution, and this key is atomically swapped for monetary value, while the encrypted blob is sent off-chain, as seen in ZKCP \cite{maxwell2016zero}. This kind of swap has one of the assets not being scrutinizable on the blockchain and hence has to rely on more complex Zero-Knowledge proofs to convince the buyer that the key encrypts a correct solution. We want to look at a more straightforward class of atomic swaps where one can scrutinize the actual asset being swapped on the blockchain, and the buyer or the swap initiator doesn't need any other data beyond the blockchain. In the base case, these swaps involve the native cryptocurrency of the blockchain(s). In the single blockchain setting, swapping coins of equal value between Alice and Bob can improve both their privacy.
 
-TN-swap, which is formally defined in Section \ref{sec:tn_swap}, is atomic but not fair. There are steps in the swap where either Alice or Bob can abort the protocol and put their counterparty at a disadvantage. The counterparty does not lose monetary value (it is an atomic swap, after all) but is either made to wait before they get their asset back or might lose blockchain fees by making extra transactions and such. We refer to the waiting part of this problem as \textit{griefing}. Protocols like Arwen \cite{arwen_protocol} rely on one of the counterparties of the atomic swap caring about protecting their reputation. A few proposals have been made to reduce griefing, but they all involve smart contracts that have access to global state storage. These smart contracts look up the swap state and proceed according to how the swap has gone so far. Some  of these proposals are: Fairswap \cite{fairswap}, Optiswap \cite{optiswap}, Han-Lin-Yu swap (HLY-swap) \cite{atomic_swaps_american_call_options}, and Xue-Herlihy swap (XH-swap) \cite{xue_herlihy_swap}. All these rely on smart contracts and are not compatible with Bitcoin natively. The former two optimize for the \textit{optimstic case}, where the swap is efficient to execute if it goes as expected. In the \textit{pessimistic case}, when the swap does not go through, a more complex dispute resolution protocol is invoked. The latter two are more focused on avoiding our griefing problem and solve it by getting the advantaged party paying a premium\footnote{} to the disadvantaged party. The HLY-swap paper draws parallels between the atomic swap and an American Call Option from traditional finance. In traditional finance, these options are made fair by getting the disadvantaged party to sell the option itself to the advantaged party. The price at which this option is sold is called the option premium. As the advantaged party pays this premium upfront to the disadvantaged party, their privilege to abort the swap is compensated for. Unfortunately, Bitcoin's stack-based execution environment does not allow access to external state storage, and these swaps cannot be directly implemented in Bitcoin natively. Both these swaps can be implemented in Bitcoin if a new opcode is added to it. Done that way, HLY-Swap uses the premium on one side of the swap but allows griefing on the other side. XH-swap avoids griefing on both sides of the swap but allows the premiums themselves to be griefed. Contrary to the claim in the XH-swap paper that griefing cannot be avoided, we present an atomic swap construction without griefing, which can also be implemented in Bitcoin with no changes to Bitcoin itself. Our protocol is also more efficient regarding the number of transactions and the worst-case timelock for which funds are locked.
+Tier Nolan's Classic Atomic Swap, which is formally defined in Section \ref{sec:tn_swap}, is atomic but not fair. There are steps in the swap where either Alice or Bob can abort the protocol and put their counterparty at a disadvantage. The counterparty does not lose monetary value (it is an atomic swap, after all) but is either made to wait before they get their asset back or might lose blockchain fees by making extra transactions and such. We refer to the waiting part of this problem as \textit{griefing}. Protocols like Arwen \cite{arwen_protocol} rely on one of the counterparties of the atomic swap caring about protecting their reputation. A few proposals have been made to reduce griefing, but they all involve smart contracts that have access to global state storage. These smart contracts look up the swap state and proceed according to how the swap has gone so far. Some  of these proposals are: Fairswap \cite{fairswap}, Optiswap \cite{optiswap}, Han-Lin-Yu swap (HLY-swap) \cite{atomic_swaps_american_call_options}, and Xue-Herlihy swap (XH-swap) \cite{xue_herlihy_swap}. All these rely on smart contracts and are not compatible with Bitcoin natively. The former two optimize for the \textit{optimstic case}, where the swap is efficient to execute if it goes as expected. In the \textit{pessimistic case}, when the swap does not go through, a more complex dispute resolution protocol is invoked. The latter two are more focused on avoiding our griefing problem and solve it by getting the advantaged party paying a premium\footnote{} to the disadvantaged party. The HLY-swap paper draws parallels between the atomic swap and an American Call Option from traditional finance. In traditional finance, these options are made fair by getting the disadvantaged party to sell the option itself to the advantaged party. The price at which this option is sold is called the option premium. As the advantaged party pays this premium upfront to the disadvantaged party, their privilege to abort the swap is compensated for. Unfortunately, Bitcoin's stack-based execution environment does not allow access to external state storage, and these swaps cannot be directly implemented in Bitcoin natively. Both these swaps can be implemented in Bitcoin if a new opcode is added to it. Done that way, HLY-Swap uses the premium on one side of the swap but allows griefing on the other side. XH-swap avoids griefing on both sides of the swap but allows the premiums themselves to be griefed. Contrary to the claim in the XH-swap paper that griefing cannot be avoided, we present an atomic swap construction without griefing, which can also be implemented in Bitcoin with no changes to Bitcoin itself. Our protocol is also more efficient regarding the number of transactions and the worst-case timelock for which funds are locked.
 
 \section{System Model}
 Our system model is based on Bitcoin, with its UTXO (Unspent Transaction Outputs) model. We require primitives like hashes, timelocks, and signatures. Furthermore, we make the following assumptions about the system.
@@ -27,49 +27,12 @@ The Atomic Swap specification consists of the following:
     \end{itemize}
 \end{itemize}
 
-\subsection{Notation}
-We recall that in the UTXO model, every transaction consumes unspent outputs of previous transactions and creates the next set of unspent outputs for other transactions to spend.\footnote{Coinbase transactions are unique transactions that do not have inputs and create new coins.} An unspent transaction output (UTXO) contains the coin value in question and a set of locking conditions. Unlocking conditions will come from the transaction that spends this UTXO. A UTXO can be locked with various primitives like digital signatures, timelocks, knowledge of preimages of hashes, basic arithmetic, and such. Note that the locking conditions and their corresponding unlocking conditions are evaluated together on the stack, and there is no other external input available during this evaluation. Not having access to external state data makes the Bitcoin model \textit{stateless}. Being stateless in this specific way makes designing smart contracts harder.
-
-In this paper, we use the transaction/predicate notation for UTXO based transactions from the Cerberus Channels paper \cite{cerberus}. We let $o = (x\,|\,P)$ to represent a UTXO that holds value $x$ and lists a predicate $P$ that locks or unlocks this UTXO. Predicate $P$ can be a base predicate (see list below) or a combination of base predicates with $\lor$ (\textit{OR}) or $\land$ (\textit{AND}) operators.
-\begin{itemize}
-    \item $\sigma_a$: Signature that matches\footnote{Bitcoin uses SIGHASH flags to control which part of a transaction is signed by whom. For simplicity, we assume what is being signed is clear from the context.} the public key $A$.
-    \item $s \ni h(s) = H_s$: The spending transaction needs to provide a preimage $s$ whose hashed value is $H_s$.
-    \item $\Delta_k$: A timelock of $k$ blocks needs to elapse to unlock the spending transaction.
-\end{itemize}
-A transaction is a mapping from a set of past UTXO's to a set future UTXO's, and can be represented as:
-$$T_i = [o_j, o_k, \ldots] \mapsto [o_i^1, o_i^2, \ldots]$$
-where $T_i$ consumes past UTXO's $o_j$, $o_k$, $\ldots$. to produce future UTXO's $\{o_i^1$, $o_i^2$, $\ldots\}$. Predicates that apprear on the left side of a transaction unlock the UTXOs in question, and those that appear on the right side lock the newly created UTXO's. An example transaction would look like:
-$$T_i = [(2\,|\sigma_a), \underbrace{(1\,|\,\Delta_{10}), (3\,|s_x)}_{T_j}] \mapsto [(6\,|\,\sigma_b \land H_{s_y})]$$
-$T_i$ is spending 3 UTXO's by providing a signature $\sigma_a$ for $A$ (Alice), waiting for time $\Delta_{10}$ (10 blocks), and a preimage $s_x$ such that the hash $h(s_x)$ was used to lock the 3rd UTXO that $T_i$ is spending. $T_i$ itself creates a new UTXO that has the coin value of 6, and can be spent by providing a signature for $B$ (Bob) and a preimage $s_y$ such that the hash $h(s_y) = H_{s_y}$. Additionally, the two spent UTXO's $(1\,|\,\Delta_{10}), (3\,|s_x)$ were created in a previous transaction $T_j$. The UTXO creating transaction (in the underbrace) is shown only if it's relevant to the protocol. In the above case, the UTXO $(2|\sigma_a)$ doesn't show a source UTXO under it, and can be assumed that the transacton from where Alice got her 2 bitcoins doesn't matter in this setting. 
-
 \section{Atomic Swaps: Prior Work}
-In this section, we formally define Tier Nolan's classic atomic swap \cite{atomic_swap} and two other sophisticated swap designs that avoid griefing to some extent but do not eliminate it. This formal treatment of these swaps reveals the scenarios where griefing happens, how premiums prevent griefing, and how premiums themselves can be griefed.
+In this section, we delve deeper into the griefing problem in Tier Nolan's classic atomic swap \cite{atomic_swap}. We also cover two other sophisticated swap designs that avoid griefing to some extent but do not eliminate it. This formal treatment of these swaps reveals the scenarios where griefing happens, how premiums prevent griefing, and how premiums themselves can be griefed.
 
 \subsection{Tier Nolan Atomic Swap}\label{sec:tn_swap}
-In Tier Nolan's classic swap (TN-swap), Alice locks $P_a$ with a timelock (refunding $P_a$ back to her) and a hashlock (so Bob can redeem $P_a$). Bob locks $P_b$ symmetrically but with a lower value for the timelock. If one of the parties aborts, the other party can wait for their timelock to expire and refund their principals back to themselves. If neither party aborts, the swap completes with both parties redeeming the principals due to them. The blockchain acts as a public bulletin board that communicates the secret preimage of the hashlock from Alice to Bob. Alice's timelock is always longer than Bob's to account for Alice's head start in the protocol and knowing the preimage of the hashlock, which enables her to finish her side of the swap first. We use the word \textit{refund} when a party's principal comes back to them after a swap is abandoned, and the word \textit{redeem} when a party can complete a swap and get the counterparty's principal. The entire set of transactions that make up the TN-swap can be defined succinctly in our notation as shown in Figure \ref{fig:tier_nolan_atomic_swap}. 
-
-\begin{figure}[hbt!]
-    \centering
-    \caption{Tier Nolan Atomic Swap}
-    \label{fig:tier_nolan_atomic_swap}
-\begin{align*}
-    &S_{all} = \{T_0, T_1, T_2, T_3, T_4, T_5\} \\
-    &T_0 = [(P_a|\sigma_a)] \mapsto [(P_a|(\sigma_a \land \Delta_2) \lor (\sigma_b \land H_{s}))] \\
-    &T_1 = [(P_b|\sigma_b)] \mapsto [(P_b|(\sigma_a \land H_{s}) \lor (\sigma_b \land \Delta_1))] \\
-    &T_2 = [\underbrace{(P_b|(\sigma_a \land s))}_{T_1}] \mapsto [(P_b|\sigma_a)]\\
-    &T_3 = [\underbrace{(P_a|(\sigma_b \land s))}_{T_0}] \mapsto [(P_a|\sigma_b)]\\
-    &T_4 = [\underbrace{(P_b|(\sigma_b \land \Delta_1))}_{T_1}] \mapsto [(P_b|(\sigma_b)] \\
-    &T_5 = [\underbrace{(P_a|(\sigma_a \land \Delta_2))}_{T_1}] \mapsto [(P_a|(\sigma_a)] \\
-    &S = \{T_0, T_1, T_2, T_3\} \\
-    &F_1 = \{T_0, T_5\} \\
-    &\text{\parbox{8cm}{[Bob aborts before committing $P_b$. Alice has to wait for $\Delta_2$, and gets no compensation]}} \\
-    &F_2 = \{T_0, T_1, T_4\} \\
-    &\text{\parbox{8cm}{[Alice aborts before redeeming $P_b$. Bob has to wait for $\Delta_1$, and gets no compensation]}}
-\end{align*}
-\end{figure}
-
 \noindent
-\textbf{Griefing}: Note that Alice and Bob both have the right to abort out of the swap before it happens. If either party aborts, their counterparty is left waiting for their timelock to expire before getting their refund. If Bob aborts, Alice has to wait for $\Delta_2$ to expire before refunding her principal $P_a$ back to her. If Alice aborts, Bob has to wait for $\Delta_1$ to refund his principal $P_b$ back to him. This leads to the notion of the locked value of funds or griefing. To account for this, we add a griefing cost to each subset $F_i$ in the atomic swap specification from Section \ref{spec}. If the griefing cost is zero for all failure subsets in the specification, we consider a protocol to be grief-free. Formally, let
+In Tier Nolan's Classic Atomic Swap, Alice and Bob both have the right to abort out of the swap before it happens. If either party aborts, their counterparty is left waiting for their timelock to expire before getting their refund. If Bob aborts, Alice has to wait for $\Delta_2$ to expire before refunding her principal $P_a$ back to her. If Alice aborts, Bob has to wait for $\Delta_1$ to refund his principal $P_b$ back to him. This leads to the notion of the locked value of funds or griefing. To account for this, we add a griefing cost to each subset $F_i$ in the atomic swap specification from Section \ref{spec}. If the griefing cost is zero for all failure subsets in the specification, we consider a protocol to be grief-free. Formally, let
 
 \begin{equation} \label{eq:cost}
  cost = \sum{f(P_i\cdot \Delta_j)} \;\;\;\; \forall i \in \{a, b\}, j \in \{1, 2, 3, \ldots\}
@@ -213,7 +176,7 @@ These four shortcomings can all be attributed to a more fundamental idea that is
     &T_1 = [(P_a|\sigma_a), (\rho_b|\sigma_b)] \mapsto [((P_a+\rho_b)| \\
     &\phantomrel{=============} {} (\sigma_b \land H_{s}) \lor (\sigma_a \land \Delta_2))]\\
     &T_2 = [(P_b|\sigma_b), \underbrace{(\rho_a|(\sigma_a \land \sigma_b))}_{T_0}] \mapsto [((P_b+\rho_a)| \\
-    &\phantomrel{=============} {} ((\sigma_a \land H_{s}) \lor (\sigma_b \land \Delta_1))]\\
+    &\phantomrel{=============} {} ((\sigma_a \land H_{s}) \lor (\sigma_a \land \Delta))]\\
     &T_3 = [\underbrace{((P_b+\rho_a)|(\sigma_a \land s))}_{T_2}] \mapsto [((P_b+\rho_a)|\sigma_a)]\\
     &T_4 = [\underbrace{((P_a+\rho_b)|(\sigma_b \land s))}_{T_1}] \mapsto [((P_a+\rho_b)|\sigma_b)]\\
     &T_5 = [\underbrace{(\rho_a|(\sigma_a \land s))}_{T_0}] \mapsto [(\rho_a|(\sigma_a)] \\
@@ -234,54 +197,54 @@ These four shortcomings can all be attributed to a more fundamental idea that is
 
 % Define block styles
 \tikzstyle{block} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, text width=3cm, draw=black]
+\tikzstyle{line} = [draw, -latex']
 \begin{figure}
   \centering
   \captionsetup{justification=centering}
   \caption{Grief-free Atomic Swap - Transaction Flow}
-  \begin{tikzpicture}[node distance=1.75cm]
+  \begin{tikzpicture}[node distance=1.35cm]
     \node [block][label=left:1] (1)  {Alice prepares \texttt{GF-T\textsubscript{0}} and sends it to Bob};
     \node [block, below of=1][label=left:] (2) {Bob aborts};
     \node [block, right=1.5cm of 2][label=right:] (3) {Bob broadcasts \texttt{GF-T\textsubscript{0}}};
-    \node [block, above=0.5cm of 3][label=right:] (4) {Alice broadcasts \texttt{GF-T\textsubscript{5}} (revealing $s$) to get back $\rho_a$};
-    \node [block, below=0.5cm of 3][label=right:] (41) {Alice keeps $\rho_a$};
+    \node [block, above=0.35cm of 3][label=right:] (4) {Alice broadcasts \texttt{GF-T\textsubscript{5}} (revealing $s$) to get back $\rho_a$};
+    \node [block, below=0.35cm of 3][label=right:] (41) {Alice keeps $\rho_a$};
     \node [block, below of=2][label=left:2] (5) {Bob sends unsigned $\rho_b$  to Alice};
     \node [block, below of=5][label=left:] (6) {Alice aborts};
-    \node [block, right =1.5cm of 6][label=right:] (7) {Bob keeps $\rho_b$};
-    \node [block, below of=6][label=left:3] (8) {Alice prepares \texttt{GF-T\textsubscript{1}} and sends it to Bob};
-    \node [block, below of=8][label=left:] (9) {Bob aborts};
+    \node [block, right=1.5cm of 6][label=right:] (7) {Bob keeps $\rho_b$};
+    \node [block, below=0.6cm of 6][label=left:3] (8) {Alice prepares \texttt{GF-T\textsubscript{1}} and sends it to Bob};
+    \node [block, below=0.6cm of 8][label=left:] (9) {Bob aborts};
     \node [block, right =1.5cm of 9][label=right:] (10) {Bob signs and broadcasts \texttt{GF-T\textsubscript{1}}};
-    \node [block, above=0.5cm of 10][label=right:] (11) {Alice has to wait for $\Delta_2$ to get back $P_a$, but gets $\rho_b$ as compensation};
-    \node [block, below=0.5cm of 10][label=right:] (12) {Alice keeps $P_a$} ;
+    \node [block, above=0.35cm of 10][label=right:] (11) {Alice has to wait for $\Delta_2$ to get back $P_a$, but gets $\rho_b$ as compensation};
+    \node [block, below=0.35cm of 10][label=right:] (12) {Alice keeps $P_a$} ;
     \node [block, below of=9][label=left:4] (13) {Bob prepares \texttt{GF-T\textsubscript{2}} and sends it to Alice};
     \node [block, below of=13] (14)[label=left:] {Alice aborts};
     \node [block, right =1.5cm of 14][label=right:] (15) {Bob keeps $P_b$ and $\rho_b$ as \texttt{GF-T\textsubscript{2}} is not broadcast yet};
-    \node[below left=1cm and 0.1cm of 14] (141) {};
-    \node[below right=1cm and 5cm of 14] (142) {};
-    \node [block, below =1.75cm of 14][label=left:5] (16) {Bob signs and broadcasts \texttt{GF-T\textsubscript{1}}; Alice signs and broadcasts \texttt{GF-T\textsubscript{1}}; either Alice or Bob broadcast \texttt{GF-T\textsubscript{0}}};
-    \node [block, below =0.75cm of 16][label=left:] (17) {Alice aborts};
+    \node[below left=0.5cm and 0.1cm of 14] (141) {};
+    \node[below right=0.5cm and 5cm of 14] (142) {};
+    \node [block, below =1.25cm of 14][label=left:5] (16) {Bob signs and broadcasts \texttt{GF-T\textsubscript{1}}; Alice signs and broadcasts \texttt{GF-T\textsubscript{1}}; either Alice or Bob broadcast \texttt{GF-T\textsubscript{0}}};
+    \node [block, below =0.35cm of 16][label=left:] (17) {Alice aborts};
     \node [block, right =1.5cm of 17][label=right:] (18) {Bob broadcasts \texttt{GF-T\textsubscript{7}}; Alice broadcasts \texttt{GF-T\textsubscript{6}}; Bob gets $\rho_a - \rho_b$ as compensation};
-    \node [block, below =0.75cm of 17][label=left:6] (19) {Bob broadcasts \texttt{GF-T\textsubscript{3}}; Bob broadcasts \texttt{GF-T\textsubscript{4}}; Swap completes};
-    \draw [arrows=-Stealth]
-    (1) edge (2)
-    (2) edge["Yes"] (3)
-    (3) edge["Yes"] (4)
-    (3) to["No"] (41)
-    (2) edge["No"] (5)
-    (5) edge (6)
-    (6) edge["Yes"] (7)
-    (6) edge["No"] (8)
-    (8) edge (9)
-    (9) edge["Yes"] (10)
-    (10) edge["Yes"] (11)
-    (10) edge["No"] (12)
-    (9) edge["No"] (13)
-    (13) edge (14)
-    (14) edge["Yes"] (15)
-    (14) edge["No"] (16)
-    (16) edge (17)
-    (17) edge["Yes"] (18)
-    (17) edge["No"] (19)
-    ;
+    \node [block, below =0.35cm of 17][label=left:6] (19) {Bob broadcasts \texttt{GF-T\textsubscript{3}}; Bob broadcasts \texttt{GF-T\textsubscript{4}}; Swap completes};
+    % Draw edges
+    \path [line] (1) -- (2);
+    \path [line] (2) -- node [above] (TextNode) {Yes} (3);
+    \path [line] (3) -- node [right] (TextNode) {Yes} (4);
+    \path [line] (3) -- node [right] (TextNode) {No} (41);
+    \path [line] (2) -- node [right] (TextNode) {No} (5);
+    \path [line] (5) -- (6);
+    \path [line] (6) -- node [above] (TextNode) {Yes} (7);
+    \path [line] (6) -- node [right] (TextNode) {No} (8);
+    \path [line] (8) -- (9);
+    \path [line] (9) -- node [above] (TextNode) {Yes} (10);
+    \path [line] (10) -- node [right] (TextNode) {Yes} (11);
+    \path [line] (10) -- node [right] (TextNode) {No} (12);
+    \path [line] (9) -- node [right] (TextNode) {No} (13);
+    \path [line] (13) -- (14);
+    \path [line] (14) -- node [above] (TextNode) {Yes} (15);
+    \path [line] (14) -- node [auto] (TextNode) {No} (16);
+    \path [line] (16) -- (17);
+    \path [line] (17) -- node [above] (TextNode) {Yes} (18);
+    \path [line] (17) -- node [right] (TextNode) {No} (19);
     \draw[dashed] (141) -- node[below] {On-chain} node[above] {Off-chain} ++(142);
   \end{tikzpicture}
 \label{fig:grief_free_swap_flow_chart}    
@@ -380,9 +343,11 @@ Section \ref{section:shortcomings} listed the four shortcomings of previous prem
 \noindent
 \textbf{Number of Transactions:} Coupling let's us go just 1 transaction over TN-swap (\texttt{GF-T\textsubscript{0}}, which sets up Alice's premium $\rho_a$). It's an open question whether we can incorporate premiums into a grief-free protocol while keeping the total number of transactions the same as TN-swap.
 
-\subsection{Disadvantages of Coupling:} As discussed before, we choose to couple the premium and principal protocols to achieve Bitcoin compatibility. As expected, this design ``anti-pattern" makes it harder to extend GF-swap to handle other use cases. Examples: Bribing free atomic swaps \cite{Nadahalli2021timelocked} \cite{mad_htlc}, Multi-party swaps across more than 2 blockchains \cite{herlihy2018atomic}, atomic swap enabled automated market makers. Out of these, the bribing-free atomic swap from \cite{Nadahalli2021timelocked} can be also made grief-free with minor tweaking of the transactions involved. Alice's timelocked refund arm from \texttt{GF-T\textsubscript{1}} has to be made to go through another layer to bring in the extra fees that Alice needs to commit to make the combined protocol bribe-free as well. 
+\subsection{Disadvantages of Coupling:} As discussed before, we choose to couple the premium and principal protocols to achieve Bitcoin compatibility. As expected, this design ``anti-pattern" makes it harder to extend GF-swap to handle other use cases. Examples: Risk-free atomic swaps from Section \ref{bribing:risk_free_atomic_swap}, MAD-HTLC \cite{mad_htlc}, Multi-party swaps across more than 2 blockchains \cite{herlihy2018atomic}, and atomic swap enabled automated market makers. Out of these, the risk-free atomic swap from Section \ref{bribing:risk_free_atomic_swap} can be also made grief-free with minor tweaking of the transactions involved. Alice's timelocked refund arm from \texttt{GF-T\textsubscript{1}} has to be made to go through another layer to bring in the extra fees that Alice needs to commit to make the combined protocol bribe-free as well. 
 
 Payment channels and atomic swaps both use HTLCs as a building block. The GF-swap has a modified version of the HTLC. It is an open question whether this modified HTLC can be used to construct payment channels.
 
 \section{Conclusion}
-We have proposed an atomic swap protocol that makes the classic Tier Nolan swap resilient to griefing while adding just one extra on-chain transaction. We compensate griefing by offering a \textit{premium} to the party that gets griefed. Most of the heavy-lifting in our swap is done off-chain, where the two parties communicate to establish the swap in the first place. Unlike other protocols, in our swap, both parties can abort the premium protocol off-chain and not on-chain. We also show that coupling the premium and the principal protocol makes the swap implementable in Bitcoin, where transaction execution does not have access to an external global state. The coupling also reduces transaction costs and the worst-case timelock. Unfortunately, this coupling makes the GF-swap non-trivial to extend to other applications without careful tweaking of transactions.
+In this chapter, we have proposed an atomic swap protocol that makes the classic Tier Nolan swap resilient to griefing while adding just one extra on-chain transaction. We compensate griefing by offering a \textit{premium} to the party that gets griefed. Most of the heavy-lifting in our swap is done off-chain, where the two parties communicate to establish the swap in the first place. Unlike other protocols, in our swap, both parties can abort the premium protocol off-chain and not on-chain. We also show that coupling the premium and the principal protocol makes the swap implementable in Bitcoin, where transaction execution does not have access to an external global state. The coupling also reduces transaction costs and the worst-case timelock. Unfortunately, this coupling makes the GF-swap non-trivial to extend to other applications without careful tweaking of transactions.
+
+The grief-free atomic swap protocol is an important tool to add to Bitcoin's privacy arsenal. With the swap being grief-free, more participants will engage in such swaps, thereby improving everyone's privacy.

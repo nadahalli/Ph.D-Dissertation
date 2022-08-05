@@ -86,11 +86,6 @@
 %\tikzexternalize[prefix=images/]
 \RequirePackage{tikz-3dplot}
 
-\RequirePackage{pgfplots}  % e.g. axis environment
-\usetikzlibrary{pgfplots.groupplots}
-\pgfplotsset{compat=newest}  %TODO Without this, get a pgfplots warning. It even appears when only including package pgfplots... strange.  % compat=newest?
-\pgfplotsset{plot coordinates/math parser=false}
-
 % figures
 \RequirePackage{graphicx}
 %\RequirePackage{svg}  % Note: seems to include package "transparent" as a dependency -> Amazon KDP does not like transparency...
@@ -339,7 +334,6 @@
 \usepackage{textcomp}
 \usepackage{tikz}
 \usepackage[title]{appendix}
-\usepackage[underline=true]{pgf-umlsd}
 \usepackage{url}
 \usepackage[utf8]{inputenc}
 \usepackage{varwidth}
@@ -353,7 +347,6 @@
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[super]{nth}
-\usetikzlibrary{shapes,arrows}
 
 \renewcommand\lstlistingname{Transaction}
 \newcommand{\htlctxn}{\texttt{HTLC\_TXN}}
@@ -366,35 +359,34 @@
 \newcommand{\latestctx}{\texttt{LATEST\_CTX}}
 \newcommand{\jtx}{\texttt{JTX}}
 \newcommand{\follow}{\emph{follow}}
+\newcommand{\refuse}{\emph{refuse}}
 \newcommand{\strong}{\emph{strong}}
 \newcommand{\weak}{\emph{weak}}
 
 %%%%%%%%%%%%%%% Atomic Swaps %%%%%%%%%%%%%%%%%
 
 
-\usepackage[underline=true]{pgf-umlsd}
-
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 
 \tikzset{
   font={\fontsize{8pt}{10}\selectfont}}
-\usetikzlibrary{arrows.meta,
-                calc, chains,
+\usetikzlibrary{arrows,
+                arrows.meta,
+                automata,
+                calc, 
+                chains,
                 quotes,
                 positioning,
+                shapes,
                 shapes.geometric}
-
-
+                
 \usepackage[super]{nth}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage[font={small,bf}]{caption}
 \newcommand*\phantomrel[1]{\mathrel{\phantom{#1}}}% My preferred typesetting
 
 \pagestyle{plain}
-\floatstyle{boxed}
-\restylefloat{figure}
-
 \floatstyle{boxed}
 \restylefloat{figure}
 
@@ -428,21 +420,8 @@ frame = single,
 \hbadness=10000
 
 %%%%%%%%%%%%%%%%%% TWAP Oracles %%%%%%%%%%%%%%%%%
-
-
-\usepackage[underline=true]{pgf-umlsd}
-
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
-
-\tikzset{
-  font={\fontsize{8pt}{10}\selectfont}}
-\usetikzlibrary{arrows.meta,
-                calc, chains,
-                quotes,
-                positioning,
-                shapes.geometric}
-
 
 \usepackage[super]{nth}
 \usepackage[font={small,bf}]{caption}
