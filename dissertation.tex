@@ -136,7 +136,7 @@
 %\RequirePackage{fancybox}
 
 %\RequirePackage{balance}  % probably not needed for book, since only one column?
-\RequirePackage[titletoc,toc,page]{appendix}
+\RequirePackage[titletoc,title,toc,page]{appendix}
 
 % Bibliography
 %\RequirePackage[sectionbib]{natbib}
@@ -329,16 +329,13 @@
 \usepackage{mdframed}
 \usepackage{minted}
 \usepackage{multirow,array}
-\usepackage[sorting=none]{biblatex}
 \usepackage[super]{nth}
 \usepackage{textcomp}
 \usepackage{tikz}
-\usepackage[title]{appendix}
 \usepackage{url}
 \usepackage[utf8]{inputenc}
 \usepackage{varwidth}
 \usepackage{xcolor}
-\usepackage{csquotes}
 \usepackage[section]{placeins}
 
 %%%%%%%%%%%%%%%%% Bribing %%%%%%%%%%%%%%%%%
@@ -632,7 +629,6 @@ frame = single,
 \chapterstart
 \pagenumbering{arabic}
 \setcounter{page}{1}
-%\setcounter{chapter}{0}  % has no effect
 \hypersetup{pageanchor=true} % enable hyperref for following pages
 
 \chapterstart
@@ -651,7 +647,6 @@ frame = single,
 \chapterstart
 \include{./chapters/3.2.swaps}
 
-
 \chapterstart
 \include{./chapters/4.outpost}
 
@@ -659,7 +654,7 @@ frame = single,
 \include{./chapters/5.oracles}
 
 \chapterstart
-\include{./chapters/conclusion}
+\include{./chapters/6.conclusion}
 
 \printbibliography
 

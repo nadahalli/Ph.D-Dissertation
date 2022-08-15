@@ -1,9 +1,0 @@
-\begin{tikzpicture}
-    \node[anchor=south west,inner sep=0] (image) at (0,0) {\includegraphics[width=0.25\textwidth]{figures/nixon_the_mission.jpg}};
-    \begin{scope}[x={(image.south east)},y={(image.north west)}]
-    	\draw[black, ultra thick, ->] (0.7, 0.75) -- (0.9, 0.75) node[anchor=south west] {x};
-    	\draw[black, ultra thick, ->] (0.7, 0.75) -- (0.7, 0.55) node[anchor=north east] {z};
-    	\filldraw[fill=white, draw=black, ultra thick] (0.7, 0.75) circle (0.03) node[anchor=south east] {y};
- 	    \filldraw[draw=black, ultra thick] (0.7, 0.75) circle (0.01) node[anchor=south east] {y};
-    \end{scope}
-\end{tikzpicture}
