@@ -1,12 +1,25 @@
 \chapter{Conclusion}  % Motivation
-\chapter{Conclusion}
 \label{chap:conclusion}
 
 \begin{chapquote}{Milton Friedman, in 1999}
-“I think the internet is going to be one of the major forces for reducing the role of government. The one thing that’s missing, but that will soon be developed, is a reliable e-cash, a method whereby on the Internet you can transfer funds from A to B without A knowing B or B knowing A”
+“I think the internet is going to be one of the major forces for reducing the role of government. The one thing that’s missing, but that will soon be developed, is a reliable e-cash, a method whereby on the Internet you can transfer funds from A to B without A knowing B or B knowing A.”
 \end{chapquote}
 
 \vskip 1em
 
-\section{First Section}
+Bitcoin is a few years into its mission of separating money and state. Skeptics have asked questions around its properties of censorship resistance, privacy, scalability, and survival - all of which are required from any new form of money. In this thesis, we have tried to answer a few questions related to these properties.
+
+\section{Summary}
+\textbf{Censorship Resistance:} Bitcoin miners do not need anyone's permission to start mining on the network, and there is no standard way for miners to coordinate censorship of transactions. In Chapter \ref{chapter:bribing}, we asked whether a certain type of timelocked transaction, only valid in the future, could motivate miners to loosely coordinate and censor a transaction valid at present. We argued that the existence of ``weak'' miners increases the chance of these valid transactions of being confirmed on the blockchain. The common knowledge of the existence of weak miners also incentivizes stronger miners to include these transactions. We also derive the necessary ratio of the fees to be paid by the victim transaction to the bribe being paid by the censoring transaction.
+
+\textbf{Privacy:} We have argued that doing coin-swaps increases the privacy of everyone in the Bitcoin ecosystem. In Chapter \ref{chapter:swaps}, we looked at a new way of doing Atomic Swaps that removes ``griefing'' from the na\"ive standard swap construction. This new construction should incentivize more people to do swaps as a part of their standard privacy protocol.
+
+\textbf{Scalability:} Payment channel networks like the Lightning Network enable orders of magnitude more number of Bitcoin transactions than are possible on the main blockchain. This scale comes at the cost of having an always online party who monitors the blockchain for cheating attempts by malicious parties. In Chapter \ref{chapter:outpost}, we came up with a new architecture for these always online parties (watchtowers) which reduces the cost of running them. Our hope is that with this version of the watchtower being easy to implement, more service providers will implement them, leading to the increased adoption of the Lightning Network.
+
+\textbf{Survival:} Bitcoin's smart contracts are severely restricted compared to other smart contract platforms like Ethereum. In Chapter \ref{chapter:oracles}, we argue that such a conservative smart contract paradigm makes implementing building blocks of decentralized finance (DeFi) protocols harder, and that is a good thing. We show that DeFi protocols that rely on on-chain oracles are easy to attack by manipulating the oracle. Most DeFi protocols eventually supplement their on-chain oracles with off-chain oracles, and thereby increase risk by placing trust in a trusted third party. Bitcoin eschews this entire paradigm by not allowing global state, and thereby preventing such smart contracts. In the long run, Bitcoin's mission on being money outweighs the ostensible benefits of running DeFi protocols that are somewhat orthogonal to the main mission. With its conservative design around smart contracting abilities, Bitcoin maximizes survival at the expense of smart contract market share.
+
+\section{Future Work}
+\textbf{Bitcoin Transaction Structures:} In the sections on Risk Free Atomic Swaps from Chapter \ref{chapter:bribing}, Grief Free Atomic Swaps from Chapter \ref{chapter:swaps}, and the Commitment Transaction construction from Chapter \ref{chapter:outpost}, we can see that adding a layer of transaction indirection solves seemingly unrelated problems of introducing fees, enabling grief-freeness, and encoding future transaction data in current transactions. We believe that there might be a unifying abstraction about how to structure Bitcoin transactions to solve specific protocol level problems.
+
+\textbf{Global State in Bitcoin:} Proposals like BIP 118/119 add a hint of global state to Bitcoin. We believe that there is a tradeoff between adding global state to Bitcoin and how it enables protocol level attacks that threaten Bitcoin's survival in the long run. Formal analysis of this trade-off would likely lead to a positive outcome one way or another: Bitcoin adopts those changes and gets the promised features, or Bitcoin eschews those changes and optimizes for long term survival.
 
