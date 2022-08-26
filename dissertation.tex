@@ -402,6 +402,8 @@ frame = single,
 \renewcommand{\ALG@name}{Protocol}
 \makeatother
 
+\usepackage{csquotes}
+
 %%%%%%%%%%%%%%%%%%%%% Outpost %%%%%%%%%%%%%%%%%%%%%
 \makeatletter
 \renewcommand{\ALG@name}{Protocol}
@@ -574,6 +576,13 @@ frame = single,
 \usepackage[sorting=none]{biblatex}
 \bibliography{references}
 
+\usepackage{afterpage}
+
+\newcommand\blankpage{%
+    \null
+    \thispagestyle{empty}%
+    \addtocounter{page}{-1}%
+    \newpage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Content %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -600,15 +609,18 @@ frame = single,
 \include{./chapters/0.1.imprint}
 
 %\chapterstart
+\include{./chapters/0.11.dedication}
+
+%\chapterstart
+\include{./chapters/0.15.acknowledgements}
+
+%\chapterstart
 \include{./chapters/0.2.abstract}
 
-%\chapterstart
-% \selectlanguage{ngerman}
-% \include{./chapters/abstract-german}
-% \selectlanguage{english}
-
-%\chapterstart
-\include{./chapters/0.4.acknowledgements}
+\chapterstart
+\selectlanguage{ngerman}
+\include{./chapters/0.3.abstract.german}
+\selectlanguage{english}
 
 % For main content, use headings including page numbers by default
 \pagestyle{headings} % page number and section in header
