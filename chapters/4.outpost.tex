@@ -28,7 +28,7 @@ Importantly, a party can try to unilaterally close a channel with a $\texttt{ctx
 
 To be able to go offline, Bob enlists the help of a watchtower that is always online, and can monitor the blockchain for cheating $\texttt{ctx}$'s. Bob gives the watchtower the first 16 bytes of every $\texttt{ctx}$'s transaction ID ($\texttt{ctx\_txid}$), and encrypts the signed $\texttt{jtx}$ to get an encrypted blob ($\texttt{ejtx}$) using the other 16 bytes of $\texttt{ctx\_txid}$ as the encryption key. Bob gives the pair $\texttt{[ctx\_txid\_prefix, ejtx]}$ to the watchtower every time a new channel update is agreed upon. 
 
-The watchtower stores a map, where keys are $\texttt{ctx\_txid\_prefixes}$ and values are $\texttt{ejtx}$s. It then watches the Bitcoin blockchain for any transaction whose $\texttt{txid\_prefix}$ matches any of the keys in its own map. If the watchtower finds a match, it extracts the $\texttt{txid\_suffix}$ from the blockchain $\texttt{txid}$, and uses this $\texttt{txid\_suffix}$ to decrypt the corresponding $\texttt{ejtx}$ from its map to get the raw $\texttt{jtx}$, which is already signed by the corresponding Bob of that channel. The watchtower then broadcasts this $\texttt{jtx}$ on the network to penalize the corresponding Alice of that channel. In implementations such as Lightning Network's LND \cite{lnd}, the watchtower is not made to store the entire signed $\texttt{jtx}$, but an encoded struct that has addresses, signatures, and other metadata to be able to construct the $\texttt{jtx}$. This encoded struct is smaller than the corresponding raw bitcoin transaction, but is still around 300-350 bytes. The $\texttt{ctx\_txid\_prefix}$ is constant at 16 bytes.
+The watchtower stores a map, where keys are $\texttt{ctx\_txid\_prefix}$s and values are $\texttt{ejtx}$s. It then watches the Bitcoin blockchain for any transaction whose $\texttt{txid\_prefix}$ matches any of the keys in its own map. If the watchtower finds a match, it extracts the $\texttt{txid\_suffix}$ from the blockchain $\texttt{txid}$, and uses this $\texttt{txid\_suffix}$ to decrypt the corresponding $\texttt{ejtx}$ from its map to get the raw $\texttt{jtx}$, which is already signed by the corresponding Bob of that channel. The watchtower then broadcasts this $\texttt{jtx}$ on the network to penalize the corresponding Alice of that channel. In implementations such as Lightning Network's LND \cite{lnd}, the watchtower is not made to store the entire signed $\texttt{jtx}$, but an encoded struct that has addresses, signatures, and other metadata to be able to construct the $\texttt{jtx}$. This encoded struct is smaller than the corresponding raw bitcoin transaction, but is still around 300-350 bytes. The $\texttt{ctx\_txid\_prefix}$ is constant at 16 bytes.
 
 A single watchtower could be watching multiple channels and yet be oblivious to it. The watchtower just sees a stream of \sloppy $\texttt{[txid\_prefix, ejtx]}$ pairs that it has to store, possibly forever. Such a watchtower cannot identify channels from such a stream as there is no channel identifier in each pair. This design preserves channel privacy in the sense that a watchtower cannot identify how many channel updates any particular channel has had. As a side note, if a channel has been closed, channel participants have no standardized way of informing the watchtower that a set of $\texttt{[txid\_prefix, ejtx]}$ pairs can be deleted from the watchtower's global map. One possible way is for the watchtower to allocate a limit on storage per user, and use a FIFO order to delete older items from its storage.
 
@@ -43,12 +43,13 @@ In this paper, we propose Outpost, a watchtower construction where it is possibl
 
 \subsection{Why is this not possible in classic Lightning?}
 
-For Alice and Bob to have a signed $\texttt{jtx}$ for a corresponding $\texttt{ctx}$, they need to first build the $\texttt{jtx}$ with its inputs and outputs. The outputs are straightforward. For the $\texttt{ctx}$ broadcast-able by Alice, the corresponding $\texttt{jtx}$ will send all of Alice's timelocked balance to Bob without any timelocks. The inputs are not so straightforward. To refer to $\texttt{ctx}$' outputs as the inputs for $\texttt{jtx}$, we need to have $\texttt{ctx\_txid}$. Let us say we have $\texttt{ctx\_txid}$, and use it construct a $\texttt{jtx}$, and get Alice and Bob to sign it. Alice then uses some encryption key and encrypts $\texttt{jtx}$ to get $\texttt{ejtx}$. We ``encode'' $\texttt{ejtx}$ in $\texttt{ctx}$ by using the \texttt{OP\_RETURN} technique and make it the 3rd output of $\texttt{ctx}$. Now, we have a self-loop problem, given that the $\texttt{ctx\_txid}$ is constructed by double SHA256 hashing the entire transaction, with its inputs and outputs. The moment we add a 3rd output, the $\texttt{ctx\_txid}$ present in $\texttt{ejtx}$ is not the real $\texttt{ctx\_txid}$. Given the way Bitcoin $\texttt{txid}$'s are constructed, there is no obvious way to encode a $\texttt{jtx}$ that spends $\texttt{ctx}$, and still encode this $\texttt{jtx}$ in the same $\texttt{ctx}$.
+For Alice and Bob to have a signed $\texttt{jtx}$ for a corresponding $\texttt{ctx}$, they need to first build the $\texttt{jtx}$ with its inputs and outputs. The outputs are straightforward. For the $\texttt{ctx}$ broadcast-able by Alice, the corresponding $\texttt{jtx}$ will send all of Alice's timelocked balance to Bob without any timelocks. The inputs are not so straightforward. To refer to $\texttt{ctx}$'s outputs as the inputs for $\texttt{jtx}$, we need to have $\texttt{ctx\_txid}$. Let us say we have $\texttt{ctx\_txid}$, and use it construct a $\texttt{jtx}$, and get Alice and Bob to sign it. Alice then uses some encryption key and encrypts $\texttt{jtx}$ to get $\texttt{ejtx}$. We ``encode'' $\texttt{ejtx}$ in $\texttt{ctx}$ by using the \texttt{OP\_RETURN} technique and make it the 3rd output of $\texttt{ctx}$. Now, we have a self-loop problem, given that the $\texttt{ctx\_txid}$ is constructed by double SHA256 hashing the entire transaction, with its inputs and outputs. The moment we add a 3rd output, the $\texttt{ctx\_txid}$ present in $\texttt{ejtx}$ is not the real $\texttt{ctx\_txid}$. Given the way Bitcoin $\texttt{txid}$'s are constructed, there is no obvious way to encode a $\texttt{jtx}$ that spends $\texttt{ctx}$, and still encode this $\texttt{jtx}$ in the same $\texttt{ctx}$.
 
 \subsection{Two other constructions that do not work}
 
 \subsubsection{Data Drop Method}
 One well known way of encoding arbitrary data in a Bitcoin transaction is to use the so-called Data-Drop method using P2SH transactions as elaborated in Sward et al \cite{sward2018data}. To encode $\texttt{jtx}$ inside $\texttt{ctx}$, we split $\texttt{ctx}$ into two: $\texttt{ctx\textsubscript{1}}$ and $\texttt{ctx\textsubscript{2}}$. $\texttt{ctx\textsubscript{1}}$'s output can be locked with scriptPubKey:
+
 \begin{verbatim}
 OP_HASH160 <hash(redeem_script)> OP_EQUAL
 \end{verbatim}
@@ -69,7 +70,7 @@ With this setup, we can include arbitrary data in the scriptSig between the sign
 
 \subsubsection{Data Hash Method}
 \sloppy
-Another way of encoding arbitrary data in a Bitcoin transaction that is immune to scriptSig malleability is using the so-called Data-Hash method using P2SH transactions; also elaborated in Sward et al\cite{sward2018data}. Here, like with the data-drop method, $\texttt{ctx}$ is split into $\texttt{ctx\textsubscript{1}}$ and $\texttt{ctx\textsubscript{2}}$, and have $\texttt{ctx\textsubscript{1}}$'s output locked in the same way as before. We prevent the subsequent $\texttt{ctx\textsubscript{2}}$'s scriptSig from being tampered with, by encoding $\texttt{ejtx}$ in the redeem script, and then using this redeem script's hash in $\texttt{ctx\textsubscript{1}}$. Say, $\texttt{ctx\textsubscript{2}}$'s redeem script looks like this: 
+Another way of encoding arbitrary data in a Bitcoin transaction that is immune to scriptSig malleability is using the so-called Data-Hash method using P2SH transactions; also elaborated in Sward et al. \cite{sward2018data}. Here, like with the data-drop method, $\texttt{ctx}$ is split into $\texttt{ctx\textsubscript{1}}$ and $\texttt{ctx\textsubscript{2}}$, and have $\texttt{ctx\textsubscript{1}}$'s output locked in the same way as before. We prevent the subsequent $\texttt{ctx\textsubscript{2}}$'s scriptSig from being tampered with, by encoding $\texttt{ejtx}$ in the redeem script, and then using this redeem script's hash in $\texttt{ctx\textsubscript{1}}$. Say, $\texttt{ctx\textsubscript{2}}$'s redeem script looks like this: 
 \begin{verbatim}
 OP_HASH160 <hash(ejtx)> OP_EQUALVERIFY
 2 <alice_pubkey> <bob_pubkey> 2 OP_CHECKMULTSIG
@@ -80,12 +81,12 @@ $\texttt{ctx\textsubscript{2}}$'s scriptSig will encode $\texttt{ejtx}$ in the s
 There is a subtler self-loop problem though: we include $\texttt{ejtx}$ in the redeem script of $\texttt{ctx\textsubscript{2}}$, and the redeem script's hash in $\texttt{ctx\textsubscript{1}}$. This changes the $\texttt{txid}$ of $\texttt{ctx\textsubscript{1}}$ and we have to spend $\texttt{ctx\textsubscript{1}}$ (through $\texttt{ctx\textsubscript{2}}$) in $\texttt{ejtx}$. We are back to the self-loop problem again, where we have to spend a UTXO in the future, but also encode the spending transaction in the present. The moment we do the encoding, the future UTXO's input $\texttt{txid}$ changes, thereby invalidating the encoding. With a linear chain of transactions with the child spending the parents' output, we run into this self-loop problem. In the following section, we show how to encode the future in the present by doing it in a separate transaction path, and then merging these paths later.
 
 \subsection{Split Commitment Transaction Construction}
-In Outpost, we have 3 commitment transactions that represent a single channel state, as opposed to just 1 commitment transaction in classic Lightning. This is in addition to the opening transaction and the justice transaction. In this section, $\texttt{topen}$ is common to both parties, Alice and Bob. Without loss of generality, the other 3 commitment transactions and 1 justice transaction are assumed to be Alice's to broadcast. Bob has symmetrically opposite transactions that he holds. Another convention in the following listings is that $pubkey\_i$ can be signed by $sig\_i$. In Section \ref{protocol}, we define these transactions more precisely with respect to signing, holding (not \textit{hodling}), and broadcasting.
+In Outpost, we have 3 commitment transactions that represent a single channel state, as opposed to just 1 commitment transaction in classic Lightning. This is in addition to the opening transaction and the justice transaction. In this section, $\texttt{topen}$ is common to both parties, Alice and Bob. Without loss of generality, the other 3 commitment transactions and 1 justice transaction are assumed to be Alice's to broadcast. Bob has symmetrically opposite transactions that he holds. Another convention in the following listings is that $\texttt{pubkey\textsubscript{i}}$ can be signed by $\texttt{sig\textsubscript{i}}$. In Section \ref{protocol}, we define these transactions more precisely with respect to signing, holding (not \textit{hodling}), and broadcasting.
 \subsubsection{Opening Transaction}
 $\texttt{topen}$ is exactly the same as in classic Lightning, in the sense that it has to spend two UTXOs, one of which is owned by Alice and one by Bob. 
 
 \begin{lstlisting}[
-    basicstyle=\ttfamily\small,
+    basicstyle=\ttfamily\small, mathescape,
     caption={Opening Transaction in Bitcoin Script-like pseudocode},
     label=topen
 ]
@@ -93,17 +94,17 @@ TOPEN: {
  txid: TOPEN_TXID
  vin: [{
    txid: source TXN that pays Alice
-   scriptSig: <Alice sig_0>
+   scriptSig: <Alice $\texttt{sig\textsubscript{0}}$>
   },{     
    txid: source TXN that pays Bob
-   scriptSig: <Bob sig_0>
+   scriptSig: <Bob $\texttt{sig\textsubscript{0}}$>
   }]      
  vout: [{
    value: <value of the channel>
    scriptPubKey: 
         2 
-        <Alice pubkey_1> 
-        <Bob pubkey_1> 
+        <Alice $\texttt{pubkey\textsubscript{1}}$> 
+        <Bob $\texttt{pubkey\textsubscript{1}}$> 
         2 OP_CHECKMULTISIG
   }]}
 \end{lstlisting}
@@ -118,35 +119,35 @@ The output of $\texttt{topen}$ is spendable by $\texttt{ctx\textsubscript{1}}$ (
 
 \begin{lstlisting}[
     mathescape=true,
-    basicstyle=\ttfamily\small,
+    basicstyle=\ttfamily\small, mathescape,
     caption={Commitment Transaction 1 in Bitcoin Script-like pseudocode},
     label=ctx1
 ]
-CTX_1: {
- txid: CTX_1_TXID
+$\texttt{CTX\textsubscript{1}}$: {
+ txid: $\texttt{CTX\textsubscript{1}}$_TXID
  vin: [{
    txid: TOPEN_TXID
    index: 0
    scriptSig: 
-        0 <Alice sig_1> <Bob sig_1>
+        0 <Alice $\texttt{sig\textsubscript{1}}$> <Bob $\texttt{sig\textsubscript{1}}$>
   }]
  vout: [{
    value: <Alice balance>
    scriptPubKey:
             2 
-            <Alice pubkey_2> 
-            <Bob pubkey_2> 
+            <Alice $\texttt{pubkey\textsubscript{2}}$> 
+            <Bob $\texttt{pubkey\textsubscript{2}}$> 
             2 OP_CHECKMULTISIG
   }, {
    value: <Bob balance>
    scriptPubKey: 
-        <Bob pubkey_3> OP_CHECKSIG
+        <Bob $\texttt{pubkey\textsubscript{3}}$> OP_CHECKSIG
   }, {
    value: INSIGNIFICANT_VALUE ($\epsilon$)
    scriptPubKey: 
         2 
-        <Alice pubkey_4> 
-        <Bob pubkey_4> 
+        <Alice $\texttt{pubkey\textsubscript{4}}$> 
+        <Bob $\texttt{pubkey\textsubscript{4}}$> 
         2 OP_CHECKMULTISIG
   }]}
 \end{lstlisting}
@@ -155,22 +156,22 @@ CTX_1: {
 The $\texttt{jtx}$ (see Listing \ref{jtx}) spends the multisig output of $\texttt{ctx\textsubscript{1}}$ and gives all of Alice's share to Bob. Note that Alice will sign this transaction only after Bob signs it, and will not hand it over to Bob in raw format. Alice encrypts this $\texttt{jtx}$ with a key of her choice to derive $\texttt{ejtx}$ and hands over $\texttt{ejtx}$ to Bob by encoding it in $\texttt{aux\_ctx}$. 
 
 \begin{lstlisting}[
-    basicstyle=\ttfamily\small,
+    basicstyle=\ttfamily\small, mathescape,
     caption={Justice Transaction in Bitcoin Script-like pseudocode},
     label=jtx
 ]
 JTX: {
  txid: JTX_TXID
  vin: [{
-   txid: CTX_1_TXID
+   txid: $\texttt{CTX\textsubscript{1}}$_TXID
    index : 0
    scriptSig: 
-        0 <Alice sig_2> <Bob sig_2>
+        0 <Alice $\texttt{sig\textsubscript{2}}$> <Bob $\texttt{sig\textsubscript{2}}$>
   }],
  vout: [{
    value: <Alice balance>
    scriptPubKey: 
-        <Bob pubkey_5> OP_CHECKSIG
+        <Bob $\texttt{pubkey\textsubscript{5}}$> OP_CHECKSIG
   }]}
 \end{lstlisting}
 
@@ -179,23 +180,23 @@ The purpose of $\texttt{aux\_ctx}$ (see Listing \ref{aux_ctx}) is to be a vehicl
 
 \begin{lstlisting}[
     mathescape=true,
-    basicstyle=\ttfamily\small,
+    basicstyle=\ttfamily\small, mathescape,
     caption={Auxiliary CTX in Bitcoin Script-like pseudocode},
     label=aux_ctx
 ]
 AUX_CTX: {
  txid: AUX_CTX_TXID
  vin: [{
-   txid: CTX_1_TXID
+   txid: $\texttt{CTX\textsubscript{1}}$_TXID
    index: 2
    scriptSig: 
-        0 <Alice sig_4> <Bob sig_4>
+        0 <Alice $\texttt{sig\textsubscript{4}}$> <Bob $\texttt{sig\textsubscript{4}}$>
   }]
  vout: [{
    value: INSIGNIFICANT_VALUE ($\epsilon$)
    scriptPubKey: 
         2 
-        <Alice pubkey_6> <Bob pubkey_6> 
+        <Alice $\texttt{pubkey\textsubscript{6}}$> <Bob $\texttt{pubkey\textsubscript{6}}$> 
         2 
         OP_CHECKMULTISIG
   }, {
@@ -210,30 +211,30 @@ The final piece of the puzzle is $\texttt{ctx\textsubscript{2}}$ (see Listing \r
 Note that if $\texttt{jtx}$ is confirmed on the Bitcoin blockchain, $\texttt{ctx\textsubscript{2}}$ becomes invalid as one of its inputs ($\texttt{ctx_1}$'s output number \#0) has now been consumed. 
 
 \begin{lstlisting}[
-    basicstyle=\ttfamily\small,
+    basicstyle=\ttfamily\small, mathescape,
     caption={Commitment Transaction 2 in Bitcoin Script-like pseudocode},
     label=ctx2
 ]
-CTX_2: {
- txid: CTX_2_TXID
+$\texttt{CTX\textsubscript{2}}$: {
+ txid: $\texttt{CTX\textsubscript{2}}$_TXID
  vin: [{
-   txid: CTX_1_TXID
+   txid: $\texttt{CTX\textsubscript{1}}$_TXID
    index: 0
    scriptSig: 
-        0 <Alice sig_2> <Bob sig_2>
+        0 <Alice $\texttt{sig\textsubscript{2}}$> <Bob $\texttt{sig\textsubscript{2}}$>
         OP_TRUE
    sequence: 0x00000090
   },{
    txid: AUX_CTX_TXID
    index: 0
    scriptSig: 
-        0 <Alice sig_6> <Bob sig_6>
+        0 <Alice $\texttt{sig\textsubscript{6}}$> <Bob $\texttt{sig\textsubscript{6}}$>
    sequence: 0x00000090
   }]
  vout: [{
    value: <Alice balance>
    scriptPubKey: 
-        <Alice pubkey_7> OP_CHECKSIG
+        <Alice $\texttt{pubkey\textsubscript{7}}$> OP_CHECKSIG
   }]}
 \end{lstlisting}
 
@@ -241,7 +242,7 @@ CTX_2: {
 If Alice and Bob are done using their channel, and want to get their current balances out, they create a classic Lightning like closure transaction that spends $\texttt{topen}$ and allocates balances to Alice and Bob based on the latest state of the channel. With respect to opening and closing a channel, Outpost's transactions on the blockchain will look exactly the same as in classic Lightning. Listing \ref{closure2} shows a cooperative closure.
 
 \begin{lstlisting}[
-    basicstyle=\ttfamily\small,
+    basicstyle=\ttfamily\small, mathescape,
     caption={Cooperative closure in Bitcoin Script-like pseudocode},
     label=closure2
 ]
@@ -251,7 +252,7 @@ CLOSURE: {
    txid: TOPEN_TXID
    index: 0
    scriptSig: 
-        0 <Alice sig_1> <Bob sig_1>
+        0 <Alice $\texttt{sig\textsubscript{1}}$> <Bob $\texttt{sig\textsubscript{1}}$>
   }]
  vout: [{
    value: <Alice balance>
