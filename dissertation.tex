@@ -5,7 +5,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Settings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \def\TARGET{1} % 1 = book (A5), 2 = review (A4)
-\def\ETARGET{2} % 1 = print, 2 = electronic
+\def\ETARGET{1} % 1 = print, 2 = electronic
 
 \input{shared_settings}
 
@@ -55,7 +55,7 @@
 \newcommand\bmmax{0}
 
 % languages
-\RequirePackage[english, ngerman]{babel} % ngerman: new german hyphenation
+\RequirePackage[english]{babel} % ngerman: new german hyphenation
 
 \RequirePackage[hyphens]{url} % allow breaking links at hyphens (needs to be specified before loading the "hyperref" package)  % option [hyphens] enables linebreaks with hyphens in URLs
 % PDF metadata
@@ -321,6 +321,7 @@
 \usepackage[font={small,bf}]{caption}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\usepackage{pdfpages}
 \usepackage{listings}
 \usepackage{mathtools}
 \usepackage{mdframed}
